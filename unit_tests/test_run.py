@@ -98,6 +98,12 @@ class TestRun(unittest.TestCase):
         expected_output = "No vars needed!"
         self.match_expected_output(expected_output)
 
+    def test_snippet_in_snippet(self):
+        self.load_config_to_env(
+            'unit_tests/test_configs/snippet_in_snippet.json')
+        expected_output = "file test.txt"
+        self.match_expected_output(expected_output)
+
     def test_snippet_with_unused_vars(self):
         self.load_config_to_env(
             'unit_tests/test_configs/snippet_with_unused_vars.json')

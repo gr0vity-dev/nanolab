@@ -3,8 +3,9 @@ import os
 import subprocess
 import threading
 from collections import defaultdict
+import inspect
+import argparse
 from app import pycmd
-import time
 
 default_class = "NodeCommands"
 
@@ -14,7 +15,25 @@ def load_json(file_path):
         return json.load(f)
 
 
-#Use {default_class} is class is misisng from config to reduce config complexity
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description="Load configuration and snippets files")
+    parser.add_argument('--config',
+                        type=str,
+                        help='Path to the configuration file')
+    parser.add_argument('--snippets',
+                        type=str,
+                        help='Path to the snippets file')
+    return parser.parse_args()
+
+
+def load_resolved_path(arg_value, env_var, default_path):
+    config_path = arg_value if arg_value else os.environ.get(
+        env_var, default_path)
+    return load_json(config_path)
+
+
+#Use {default_class} if "class" is missing from python commands to reduce config complexity
 def set_default_class(command):
     if command.get("type") in ["python"]:
         command.setdefault("class", default_class)
@@ -97,13 +116,34 @@ def load_snippet_by_key(snippets, snippet_by_key):
     return snippets[snippet_by_key]
 
 
+def get_completed_variables(config):
+    variables = config.get('variables', {})
+
+    #add global variables
+    variables["docker_tag"] = os.environ["docker_tag"]
+    return variables
+
+
+def get_method_parameters(method):
+    signature = inspect.signature(method)
+    return [param.name for param in signature.parameters.values()]
+
+
+def get_filtered_variables(method, variables):
+    method_parameters = get_method_parameters(method)
+    return {
+        key: value
+        for key, value in variables.items() if key in method_parameters
+    }
+
+
 def execute_snippet(command_config, snippets):
     snippet = load_snippet_by_key(snippets, command_config["key"])
 
     validate_mandatory_vars(snippet, command_config)
 
     for snippet_command in snippet["commands"]:
-        snippet_command["variables"] = command_config.get("variables")
+        snippet_command["variables"] = get_completed_variables(command_config)
         execute_command(snippet_command, snippets)
 
 
@@ -113,27 +153,49 @@ def execute_python(command_config):
     instance = cls(**command_config.get('constructor_params', {}))
 
     method = getattr(instance, command_config['method'])
-    variables = command_config.get('variables', {})
+    variables = get_completed_variables(command_config)
+    #filter variables that are not in the method signature (e.g. global variables like docker_tag)
+    filtered_variables = get_filtered_variables(method, variables)
 
-    method(**variables)
+    method(**filtered_variables)
+
+
+def get_formatted_command(command_config):
+    variables = get_completed_variables(command_config)
+    command = command_config['command']
+    if variables: command = command.format(**variables)
+    return command
+
+
+def print_output(process):
+    while True:
+        output = process.stdout.readline()
+        if output == '' and process.poll() is not None:
+            break
+        if output:
+            print(output.strip())
+
+
+def print_errors(process, command):
+    stderr = process.stderr.read()
+    if process.returncode != 0:
+        print(f"Error executing command: {command}\nError: {stderr.strip()}")
 
 
 def execute_bash(command_config):
-    variables = command_config.get("variables")
-    command = command_config['command']
-    if variables: command = command.format(**variables)
-    process = subprocess.Popen(command,
-                               shell=True,
-                               stdout=subprocess.PIPE,
-                               stderr=subprocess.PIPE)
-    stdout, stderr = process.communicate()
+    command = get_formatted_command(command_config)
 
-    if process.returncode != 0:
-        print(
-            f"Error executing command: {command}\nError: {stderr.decode('utf-8')}"
-        )
-    else:
-        print(stdout.decode('utf-8'))
+    process = subprocess.Popen(
+        command,
+        shell=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        universal_newlines=True,  # Decode the output as text
+        bufsize=1)  # Set bufsize to 1 for line buffering
+
+    # Print the output in real-time
+    print_output(process)
+    print_errors(process, command)
 
 
 def execute_command_sequence(commands):
@@ -182,21 +244,36 @@ def execute_command(command_config, snippets):
         execute_threaded(command_config['commands'])
 
 
-def main():
-    config_file_path = 'config.json'
-    snippets_file_path = 'snippets.json'
+def load_and_validate_configs():
+    args = parse_args()
 
-    config_data = load_json(os.environ.get("CONFIG_FILE", config_file_path))
-    snippets_data = load_json(
-        os.environ.get("SNIPPET_FILE", snippets_file_path))
+    default_config_path = 'config.example.json'
+    default_snippets_path = 'app/snippets.json'
 
-    complete_config(config_data, snippets_data)
-    validate_config(config_data)
+    config = load_resolved_path(args.config, "CONFIG_FILE",
+                                default_config_path)
+    snippets = load_resolved_path(args.snippets, "SNIPPET_FILE",
+                                  default_snippets_path)
 
-    for docker_tag in config_data["docker_tags"]:
+    complete_config(config, snippets)
+    validate_config(config)
+
+    return config, snippets
+
+
+def execute_commands(config, snippets):
+
+    #Easily allow for comparison between docker_tags
+    for docker_tag in config["docker_tags"]:
         os.environ["docker_tag"] = docker_tag
-        for command_config in config_data["commands"]:
-            execute_command(command_config, snippets_data)
+        for command_config in config["commands"]:
+            execute_command(command_config, snippets)
+
+
+def main():
+
+    config, snippets = load_and_validate_configs()
+    execute_commands(config, snippets)
 
 
 if __name__ == "__main__":

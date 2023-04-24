@@ -1,59 +1,9 @@
-{
-    "docker_tags": [
-        "nanocurrency/nano:V24.0"
-    ],
+{    
+    "docker_tags" : ["nanocurrency/nano:V24.0"],
     "commands": [
         {
-            "type": "threaded",
-            "commands": [
-                {
-                    "type": "python",
-                    "class": "TestClass",
-                    "method": "long_running_method",
-                    "variables": {
-                        "duration": 0.5
-                    }
-                },
-                {
-                    "type": "python",
-                    "class": "TestClass",
-                    "method": "long_running_method",
-                    "variables": {
-                        "duration": 0.5
-                    }
-                }
-            ]
-        },
-        {
-            "skip": true,
-            "type": "threaded",
-            "commands": [
-                {
-                    "type": "python",
-                    "class": "TestClass",
-                    "method": "long_running_method",
-                    "variables": {
-                        "duration": 0.5
-                    }
-                },
-                {
-                    "type": "python",
-                    "class": "TestClass",
-                    "method": "long_running_method",
-                    "variables": {
-                        "duration": 0.5
-                    }
-                }
-            ]
-        },
-        {
-            "skip": true,
             "type": "snippet",
-            "key": "setup_easy",
-            "variables": {
-                "NODES_CONFIG": "3node_net_nanolocal_config.toml",
-                "REMOTE_IP": "127.0.0.1"
-            }
+            "key": "test_snippet_no_vars"
         }
     ]
 }

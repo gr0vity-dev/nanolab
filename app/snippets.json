@@ -1,0 +1,85 @@
+{   
+    "setup_ledger_and_config": {
+        "mandatory_vars": [
+            "LEDGER",
+            "SETUP_NODES",
+            "NL_CONFIG",
+            "NODES_CONFIG",
+            "REMOTE_IP"
+        ],
+        "commands": [
+            {
+                "type": "bash",
+                "command": "./nl_run down "
+            },
+            {
+                "type": "bash",
+                "variables" : ["NL_CONFIG"],
+                "command": "cp ./speedsuite/testcases/nanolocal/saved_configs/$NL_CONFIG ./nanolocal/nl_config.toml"
+            },
+            {
+                "type": "bash",
+                "variables" : ["REMOTE_IP"],
+                "command": "./nl_run conf_edit --nested_path remote_address --value $REMOTE_IP"
+            },
+            {
+                "type": "bash",
+                "variables" : ["DOCKER_TAG"],
+                "command": "./nl_run conf_edit --nested_path representatives.docker_tag --value $DOCKER_TAG"
+            },
+            {
+                "type": "bash",
+                "command": "./nl_run conf_edit --nested_path representatives.config_node_path --value $NODES_CONFIG"
+            },
+            {
+                "type": "bash",
+                "command": "./nl_run conf_edit --nested_path representatives.nodes.*.config_node_path --value $NODES_CONFIG"
+            },
+            {
+                "type": "bash",
+                "command": "./nl_run create && ./nl_run reset"
+            },
+            {
+                "type": "bash",
+                "command": "for i in $SETUP_NODES; do cp ./speedsuite/testcases/nanolocal/saved_ledgers/$LEDGER ./nanolocal/nano_nodes/${i}/NanoTest/data.ldb; done"
+            }
+        ]
+    },
+
+    "setup_easy": {
+        "mandatory_vars": [
+            "NODES_CONFIG",
+            "REMOTE_IP"
+        ],
+        "commands": [
+            {
+                "type": "bash",
+                "command": "./nl_run down "
+            },
+            {
+                "type": "bash",
+                "variables" : ["REMOTE_IP"],
+                "command": "./nl_run conf_edit --nested_path remote_address --value $REMOTE_IP"
+            },
+            {
+                "type": "bash",
+                "variables" : ["docker_tag"],
+                "command": "./nl_run conf_edit --nested_path representatives.docker_tag --value $docker_tag"
+            },
+            {
+                "type": "bash",
+                "variables" : ["NODES_CONFIG"],
+                "command": "./nl_run conf_edit --nested_path representatives.config_node_path --value $NODES_CONFIG"
+            },
+            {
+                "type": "bash",
+                "variables" : ["NODES_CONFIG"],
+                "command": "./nl_run conf_edit --nested_path representatives.nodes.*.config_node_path --value $NODES_CONFIG"
+            },
+            {
+                "type": "bash",
+                "command": "./nl_run create && ./nl_run reset && ./nl_run start && ./nl_run init && ./nl_run restart_wait_sync"
+            }
+        ]
+    }
+}

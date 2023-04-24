@@ -29,5 +29,16 @@
                 "command": "echo 'No vars needed!'"
             }
         ]
+    },
+    "snippet_in_snippet": {
+        "commands": [
+            {
+                "type": "snippet",
+                "key": "test_snippet",
+                "variables": {
+                    "file_name": "test.txt"
+                }
+            }
+        ]
     }
 }

@@ -1,0 +1,16 @@
+{
+    "docker_tags": [
+        "nanocurrency/nano:V24.0"
+    ],
+    "commands": [        
+        {
+            "skip": false,
+            "type": "snippet",
+            "key": "setup_easy",
+            "variables": {
+                "NODES_CONFIG": "app/3node_network/nanolocal_config.toml",
+                "REMOTE_IP": "127.0.0.1"
+            }
+        }
+    ]
+}

@@ -2,3 +2,6 @@
 **/*_cache*
 .old*
 config.json
+venv_py/
+**/.DS_Store
+**/._.DS_Store

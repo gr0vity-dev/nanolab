@@ -58,27 +58,23 @@
             },
             {
                 "type": "bash",
-                "variables" : ["REMOTE_IP"],
                 "command": "./nl_run conf_edit --nested_path remote_address --value $REMOTE_IP"
             },
             {
                 "type": "bash",
-                "variables" : ["docker_tag"],
                 "command": "./nl_run conf_edit --nested_path representatives.docker_tag --value $docker_tag"
             },
             {
                 "type": "bash",
-                "variables" : ["NODES_CONFIG"],
                 "command": "./nl_run conf_edit --nested_path representatives.config_node_path --value $NODES_CONFIG"
             },
             {
                 "type": "bash",
-                "variables" : ["NODES_CONFIG"],
                 "command": "./nl_run conf_edit --nested_path representatives.nodes.*.config_node_path --value $NODES_CONFIG"
             },
             {
                 "type": "bash",
-                "command": "./nl_run create && ./nl_run reset && ./nl_run start && ./nl_run init && ./nl_run restart_wait_sync"
+                "command": "./nl_run create && ./nl_run reset && ./nl_run start && ./nl_run init && ./nl_run restart_wait_sync && ./nl_run pytest"
             }
         ]
     }

@@ -1,0 +1,10 @@
+{
+    "docker_tags" : ["tag1"],
+    "commands": [
+        {
+            "type": "python",
+            "class": "NodeCommands",
+            "method": "non_existent_method"
+        }
+    ]
+}

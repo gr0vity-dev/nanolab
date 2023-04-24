@@ -1,0 +1,42 @@
+{
+    "docker_tags" : ["tag1"],
+    "commands": [
+        {
+            "type": "threaded",
+            "commands": [
+                {
+                    "type": "python",
+                    "class": "TestClass",
+                    "method": "long_running_method",
+                    "variables" : {"duration" : 0.1} 
+                },
+                {
+                    "type": "python",
+                    "class": "TestClass",
+                    "method": "long_running_method",
+                    "variables" : {"duration" : 0.1} 
+                },
+                {
+                    "type": "python",
+                    "class": "TestClass",
+                    "group": "g1",
+                    "method": "long_running_method",
+                    "variables" : {"duration" : 0.1} 
+                },
+                {
+                    "type": "python",
+                    "class": "TestClass",
+                    "group": "g1",
+                    "method": "long_running_method",
+                    "variables" : {"duration" : 0.1} 
+                },
+                {
+                    "type": "python",
+                    "class": "TestClass",
+                    "method": "long_running_method",
+                    "variables" : {"duration" : 0.1} 
+                }
+            ]
+        }
+    ]
+}

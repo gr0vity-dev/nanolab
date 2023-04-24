@@ -1,0 +1,9 @@
+{
+    "docker_tags" : ["tag1"],
+    "commands": [
+        {
+            "type": "invalid",
+            "command": "echo 'Hello, World!'"
+        }
+    ]
+}

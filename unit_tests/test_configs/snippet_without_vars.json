@@ -1,0 +1,9 @@
+{    
+    "docker_tags" : ["nanocurrency/nano:V24.0"],
+    "commands": [
+        {
+            "type": "snippet",
+            "key": "test_snippet_no_vars"
+        }
+    ]
+}

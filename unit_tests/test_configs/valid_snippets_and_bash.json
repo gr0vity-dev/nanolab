@@ -1,0 +1,16 @@
+{
+    "docker_tags" : ["tag1"],
+    "commands": [
+        {
+            "type": "bash",
+            "command": "echo 'Hello, World!'"
+        },
+        {
+            "type": "snippet",
+            "key": "test_snippet",
+            "variables": {
+                "file_name": "test.txt"
+            }
+        }
+    ]
+}

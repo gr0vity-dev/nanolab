@@ -1,0 +1,12 @@
+{
+    "docker_tags" : ["tag1"],
+    "commands": [
+        {
+            "type": "snippet",
+            "key": "non_existent_snippet",
+            "variables": {
+                "filename": "test.txt"
+            }
+        }
+    ]
+}

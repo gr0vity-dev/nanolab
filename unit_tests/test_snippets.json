@@ -1,0 +1,33 @@
+{
+    "test_snippet": {
+        "mandatory_vars": [
+            "file_name"            
+        ],
+        "commands": [
+            {
+                "type": "bash",
+                "command": "echo file {file_name}"
+            }
+        ]
+    },
+    "test_snippet_unused_mandatory_var": {
+        "mandatory_vars": [
+            "file_name",
+            "unused_mandatory_var"
+        ],
+        "commands": [
+            {
+                "type": "bash",
+                "command": "echo file {file_name}"
+            }
+        ]
+    },
+    "test_snippet_no_vars": {
+        "commands": [
+            {
+                "type": "bash",
+                "command": "echo 'No vars needed!'"
+            }
+        ]
+    }
+}

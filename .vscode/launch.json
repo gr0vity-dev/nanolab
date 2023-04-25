@@ -9,7 +9,8 @@
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
             "env": {
-                "SNIPPET_FILE": "unit_tests/test_snippets.json"
+                "SNIPPET_FILE": "app/snippets.json",
+                "CONFIG_FILE" : "app/configs/3node_network/easy_setup.json"
             }
         }
     ]

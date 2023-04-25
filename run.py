@@ -1,3 +1,5 @@
+#!./venv_py/bin/python
+
 import json
 import os
 import subprocess
@@ -244,8 +246,7 @@ def execute_command(command_config, snippets):
         execute_threaded(command_config['commands'])
 
 
-def load_and_validate_configs():
-    args = parse_args()
+def load_and_validate_configs(args):
 
     default_config_path = 'config.example.json'
     default_snippets_path = 'app/snippets.json'
@@ -270,11 +271,11 @@ def execute_commands(config, snippets):
             execute_command(command_config, snippets)
 
 
-def main():
+def main(args=None):
 
-    config, snippets = load_and_validate_configs()
+    config, snippets = load_and_validate_configs(args)
     execute_commands(config, snippets)
 
 
 if __name__ == "__main__":
-    main()
+    main(parse_args())

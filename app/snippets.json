@@ -4,7 +4,6 @@
             "LEDGER",
             "SETUP_NODES",
             "NL_CONFIG",
-            "NODES_CONFIG",
             "REMOTE_IP"
         ],
         "commands": [
@@ -14,26 +13,15 @@
             },
             {
                 "type": "bash",
-                "variables" : ["NL_CONFIG"],
-                "command": "cp ./speedsuite/testcases/nanolocal/saved_configs/$NL_CONFIG ./nanolocal/nl_config.toml"
+                "command": "cp {NL_CONFIG} submodules/nanolocal/nanolocal/nl_config.toml"
             },
             {
                 "type": "bash",
-                "variables" : ["REMOTE_IP"],
-                "command": "./nl_run conf_edit --nested_path remote_address --value $REMOTE_IP"
+                "command": "./nl_run conf_edit --nested_path remote_address --value {REMOTE_IP}"
             },
             {
                 "type": "bash",
-                "variables" : ["DOCKER_TAG"],
-                "command": "./nl_run conf_edit --nested_path representatives.docker_tag --value $DOCKER_TAG"
-            },
-            {
-                "type": "bash",
-                "command": "./nl_run conf_edit --nested_path representatives.config_node_path --value $NODES_CONFIG"
-            },
-            {
-                "type": "bash",
-                "command": "./nl_run conf_edit --nested_path representatives.nodes.*.config_node_path --value $NODES_CONFIG"
+                "command": "./nl_run conf_edit --nested_path representatives.docker_tag --value {docker_tag}"
             },
             {
                 "type": "bash",
@@ -41,40 +29,40 @@
             },
             {
                 "type": "bash",
-                "command": "for i in $SETUP_NODES; do cp ./speedsuite/testcases/nanolocal/saved_ledgers/$LEDGER ./nanolocal/nano_nodes/${i}/NanoTest/data.ldb; done"
+                "command": "for i in {SETUP_NODES}; do cp {LEDGER} submodules/nanolocal/nanolocal/nano_nodes/$i/NanoTest/data.ldb; done"
+            },
+            {
+                "type": "bash",
+                "command": "./nl_run start && ./nl_run init_wallets"
             }
         ]
     },
 
     "setup_easy": {
         "mandatory_vars": [
-            "NODES_CONFIG",
+            "NL_CONFIG",
             "REMOTE_IP"
         ],
         "commands": [
             {
                 "type": "bash",
-                "command": "./nl_run down "
+                "command": "./nl_run down"
             },
             {
                 "type": "bash",
-                "command": "./nl_run conf_edit --nested_path remote_address --value $REMOTE_IP"
+                "command": "cp {NL_CONFIG} submodules/nanolocal/nanolocal/nl_config.toml"
             },
             {
                 "type": "bash",
-                "command": "./nl_run conf_edit --nested_path representatives.docker_tag --value $docker_tag"
+                "command": "./nl_run conf_edit --nested_path remote_address --value {REMOTE_IP}"
             },
             {
                 "type": "bash",
-                "command": "./nl_run conf_edit --nested_path representatives.config_node_path --value $NODES_CONFIG"
-            },
+                "command": "./nl_run conf_edit --nested_path representatives.docker_tag --value {docker_tag}"
+            },            
             {
                 "type": "bash",
-                "command": "./nl_run conf_edit --nested_path representatives.nodes.*.config_node_path --value $NODES_CONFIG"
-            },
-            {
-                "type": "bash",
-                "command": "./nl_run create && ./nl_run reset && ./nl_run start && ./nl_run init && ./nl_run restart_wait_sync && ./nl_run pytest"
+                "command": "./nl_run create && ./nl_run reset && ./nl_run start && ./nl_run init && ./nl_run restart_wait_sync"
             }
         ]
     }

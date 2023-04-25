@@ -1,15 +1,32 @@
 {
     "docker_tags": [
-        "nanocurrency/nano:V24.0"
+        "db35_rev_a302_fde8", "nanocurrency/nano-beta:V25.0DB35"
     ],
-    "commands": [        
+    "commands": [
         {
             "skip": false,
             "type": "snippet",
-            "key": "setup_easy",
+            "key": "setup_ledger_and_config",
             "variables": {
-                "NODES_CONFIG": "app/3node_network/nanolocal_config.toml",
-                "REMOTE_IP": "127.0.0.1"
+                "NL_CONFIG": "app/configs/3node_network/nl_config_default.toml",
+                "REMOTE_IP": "127.0.0.1",
+                "SETUP_NODES": "nl_genesis nl_pr1 nl_pr2 nl_pr3",
+                "LEDGER": "app/data/ledgers/3pr_init.ldb"
+            }
+        },
+        {
+            "skip": false,
+            "type": "python",
+            "class": "NodeInteraction",
+            "method": "publish_blocks_test",
+            "variables": {
+                "params": {
+                    "blocks_path": "app/data/blocks/3node_net.bintree.50k.json",
+                    "bps": 5000
+                },
+                "logger_type": "rpc",
+                "logger_timeout": 180,
+                "logger_include_peers": ["nl_genesis","nl_pr1"]
             }
         }
     ]

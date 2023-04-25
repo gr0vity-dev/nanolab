@@ -6,6 +6,8 @@ import io
 from pathlib import Path
 from unittest.mock import patch
 import run
+import pytest
+from argparse import Namespace
 
 
 #@patch decorator is used to replace 'app.run.NodeCommands' with the following TestClass
@@ -16,6 +18,9 @@ class TestClass:
 
 
 class TestRun(unittest.TestCase):
+
+    #allow pytest to work with interference from argparse config
+    dummy_args = Namespace(config=None, snippets=None)
 
     @staticmethod
     def load_json(file_path):
@@ -28,7 +33,7 @@ class TestRun(unittest.TestCase):
 
     def match_expected_error(self, error_type, expected_message):
         with self.assertRaises(error_type) as cm:
-            run.main()
+            run.main(self.dummy_args)
 
         self.assertEqual(str(cm.exception), expected_message)
 
@@ -36,12 +41,21 @@ class TestRun(unittest.TestCase):
         captured_output = io.StringIO()
         # Replace sys.stdout with captured_output within the context
         with patch('sys.stdout', captured_output):
-            run.main()
+            run.main(self.dummy_args)
 
         # Get the captured output as a string
         output = captured_output.getvalue().replace("\r", "").replace("\n", "")
 
         self.assertEqual(output, expected_output)
+
+    def contains_expected_substring(self, expected_substring):
+        captured_output = io.StringIO()
+        with patch('sys.stdout', captured_output):
+            run.main(self.dummy_args)
+        # Get the captured output as a string
+        output = captured_output.getvalue().replace("\r", "").replace("\n", "")
+
+        self.assertIn(expected_substring, output)
 
     #@patch('app.pycmd.NodeCommands', new=TestClass)
     def test_invalid_type(self):
@@ -73,7 +87,7 @@ class TestRun(unittest.TestCase):
         start_time = time.time()
         self.load_config_to_env(
             'unit_tests/test_configs/threaded_parallel.json')
-        run.main()
+        run.main(self.dummy_args)
         duration = time.time() - start_time
         self.assertTrue(duration > 0.48) and self.assertTrue(duration < 0.52)
 
@@ -81,7 +95,7 @@ class TestRun(unittest.TestCase):
         start_time = time.time()
         self.load_config_to_env(
             'unit_tests/test_configs/threaded_with_group.json')
-        run.main()
+        run.main(self.dummy_args)
         duration = time.time() - start_time
         self.assertTrue(duration > 0.18, f"too short: {duration:.2f} s")
         self.assertTrue(duration < 0.22, f"too long: {duration:.2f} s")
@@ -109,6 +123,12 @@ class TestRun(unittest.TestCase):
             'unit_tests/test_configs/snippet_with_unused_vars.json')
         expected_output = "file test.txt"
         self.match_expected_output(expected_output)
+
+    @pytest.mark.nanolocal
+    def test_nanolocal_down(self):
+        self.load_config_to_env('unit_tests/test_configs/nanolocal_down.json')
+        expected_output = "[SUCCESS] - all containers removed"
+        self.contains_expected_substring(expected_output)
 
 
 if __name__ == '__main__':

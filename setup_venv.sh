@@ -25,7 +25,7 @@ create_venv() {
   git submodule update --init --recursive
 
   echo "Downloading blocks and ledgers..."
-  app/data/download_data.sh
+  nanolab/data/download_data.sh
 
   echo "Setup complete."
 }

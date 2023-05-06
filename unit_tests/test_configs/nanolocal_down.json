@@ -3,7 +3,7 @@
     "commands": [
         {
             "type": "bash",
-            "command":  "./nl_run down"
+            "command":  "nanomock down"
         }
     ]
 }

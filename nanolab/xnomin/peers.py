@@ -8,7 +8,7 @@ from hashlib import blake2b
 import ed25519_blake2b
 import json
 import requests
-from submodules.xnomin.acctools import to_account_addr, account_key
+from nanolab.xnomin.acctools import to_account_addr, account_key
 
 
 def get_peers_from_service(ctx: dict, url=None):
@@ -559,7 +559,7 @@ class Peer:
 
     @classmethod
     def from_json(self, json_peer):
-        from submodules.xnomin.telemetry_req import telemetry_ack
+        from nanolab.xnomin.telemetry_req import telemetry_ack
         # Add 'incoming' argument when peer service code gets updated
         peer = Peer(ip_addr(json_peer['ip']), json_peer['port'],
                     json_peer['score'], json_peer['is_voting'])  #,

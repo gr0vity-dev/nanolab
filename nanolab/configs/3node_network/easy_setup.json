@@ -8,25 +8,25 @@
             "type": "snippet",
             "key": "setup_ledger_and_config",
             "variables": {
-                "NL_CONFIG": "app/configs/3node_network/nl_config_default.toml",
+                "NL_CONFIG": "nanolab/configs/3node_network/nl_config_default.toml",
                 "REMOTE_IP": "127.0.0.1",
                 "SETUP_NODES": "nl_genesis nl_pr1 nl_pr2 nl_pr3",
-                "LEDGER": "app/data/ledgers/3pr_init.ldb"
+                "LEDGER": "nanolab/data/ledgers/3pr_init.ldb"
             }
         },
         {
             "skip": false,
             "type": "python",
             "class": "NodeInteraction",
-            "method": "publish_blocks_test",
+            "method": "publish_blocks",
             "variables": {
-                "params": {
-                    "blocks_path": "app/data/blocks/3node_net.bintree.50k.json",
+                "publish_params": {
+                    "blocks_path": "nanolab/data/blocks/3node_net.bintree.50k.json",
                     "bps": 5000
                 },
                 "logger_type": "rpc",
                 "logger_timeout": 180,
-                "logger_include_peers": ["nl_genesis","nl_pr1"]
+                "logger_exclude_peers": ["nl_genesis","nl_pr1"]
             }
         }
     ]

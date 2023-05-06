@@ -1,0 +1,36 @@
+{
+    "docker_tags": [
+        "nanocurrency/nano-beta:V25.0DB35", "nanocurrency/nano:V24.0", "db35_rev_a302_fde8"
+    ],
+    "commands": [
+        {
+            "skip": false,
+            "type": "snippet",
+            "key": "setup_ledger_and_config",
+            "variables": {
+                "NL_CONFIG": "nanolab/configs/10node_network/nl_config_default.toml",
+                "REMOTE_IP": "127.0.0.1",
+                "SETUP_NODES": "nl_genesis nl_pr1 nl_pr2 nl_pr3 nl_pr4 nl_pr5 nl_pr6 nl_pr7 nl_pr8 nl_pr9 nl_pr10",
+                "LEDGER": "nanolab/data/ledgers/10pr_init.ldb"
+            }
+        },
+        {
+            "skip": false,
+            "type": "python",
+            "method": "publish_blocks",
+            "variables": {
+                "publish_params": {
+                    "blocks_path": "nanolab/data/blocks/10node_100k_bintree.json",
+                    "bps": 1000,
+                    "subset" :{
+                        "start_index" : 0,
+                        "end_index" : 1000
+                    }
+                },
+                "logger_type": "rpc",
+                "logger_timeout": 20,
+                "_logger_include_peers": ["nl_pr1"]
+            }
+        }
+    ]
+}

@@ -1,13 +1,14 @@
 import os
 
-os.environ["NL_APP_DIR"] = "submodules/nanolocal/nanolocal"
+os.environ["NL_APP_DIR"] = "."
 
-from submodules.xnomin.peers import get_connected_socket_endpoint, message_header, block_state, block_type_enum, message_type_enum, network_id, message_type, get_peers_from_service
-from submodules.xnomin.handshake import node_handshake_id
+from nanolab.xnomin.peers import get_connected_socket_endpoint, message_header, block_state, block_type_enum, message_type_enum, network_id, message_type, get_peers_from_service
+from nanolab.xnomin.handshake import node_handshake_id
 
-from nanolocal.common.nl_parse_config import ConfigParser, ConfigReadWrite
-from nanolocal.common.nl_rpc import NanoRpc
-from app.node_tools import StatsLogger
+from nanomock.modules.nl_parse_config import ConfigParser, ConfigReadWrite
+from nanomock.modules.nl_rpc import NanoRpc
+from nanolab.node_tools import StatsLogger
+from nanolab.decorators import ensure_duration
 
 from typing import Any, Dict, List, Optional
 import asyncio
@@ -18,56 +19,56 @@ import itertools
 
 def load_nodes_config():
     """Load nodes configuration from a file."""
-    config_parser = ConfigParser()
+    config_parser = ConfigParser(os.environ.get("NL_APP_DIR", "."))
     return config_parser.get_nodes_config()
 
 
+async def create_logger(node, logger_type, hashes, logger_timeout,
+                        logger_expected_count):
+
+    nanorpc = NanoRpc(node["rpc_url"])
+    node_version = nanorpc.version()
+    formatted_node_version = f'{node_version["node_vendor"]} {node_version["build_info"][0:7]}'
+    start_block_count = nanorpc.block_count()
+
+    logger = StatsLogger(logger_type,
+                         node["name"],
+                         formatted_node_version,
+                         hashes,
+                         start_block_count,
+                         timeout=logger_timeout,
+                         expected_block_count=logger_expected_count,
+                         ws_url=node["ws_url"],
+                         rpc_url=node["rpc_url"])
+    return logger
+
+
+#Allow some time, to ensure StatsLoggers are correctly initialized before blocks are published by any thread
+@ensure_duration(duration=2)
 async def create_loggers(hashes,
                          logger_type=None,
                          logger_timeout=None,
                          included_peers=None,
-                         excluded_peers=None):
-    """
-    Create loggers for nodes.
+                         excluded_peers=None,
+                         logger_expected_count=None):
 
-    :param hashes: list of hashes to log
-    :param logger_type: type of logger to use
-    :param logger_timeout: logger timeout
-    :param included_peers: list of peers to include in logging
-    :param excluded_peers: list of peers to exclude from logging
-    :return: list of logger instances
-    """
+    if not logger_type: return []
     nodes_config = load_nodes_config()
-    loggers = []
+    tasks = []
     for node in nodes_config:
         if included_peers and node["name"] not in included_peers:
             continue
         if excluded_peers and node["name"] in excluded_peers:
             continue
+        tasks.append(
+            create_logger(node, logger_type, hashes, logger_timeout,
+                          logger_expected_count))
 
-        nanorpc = NanoRpc(node["rpc_url"])
-        node_version = nanorpc.version()
-        formatted_node_version = f'{node_version["node_vendor"]} {node_version["build_info"][0:7]}'
-        start_block_count = nanorpc.block_count()
-
-        logger = StatsLogger(logger_type,
-                             node["name"],
-                             formatted_node_version,
-                             hashes,
-                             start_block_count,
-                             timeout=logger_timeout,
-                             ws_url=node["ws_url"],
-                             rpc_url=node["rpc_url"])
-        loggers.append(logger)
+    loggers = await asyncio.gather(*tasks)
     return loggers
 
 
 async def start_loggers(loggers):
-    """
-    Start loggers.
-
-    :param loggers: list of logger instances
-    """
     logger_tasks = [asyncio.create_task(logger.start()) for logger in loggers]
     await asyncio.gather(*logger_tasks)
 
@@ -76,25 +77,17 @@ async def xnolib_publish(params: dict,
                          logger_type=None,
                          logger_timeout=None,
                          included_peers=None,
-                         excluded_peers=None):
-    """
-    Publish data using Xnolib and enable logging.
+                         excluded_peers=None,
+                         logger_expected_count=None):
 
-    :param logger_type: type of logger to use
-    :param logger_timeout: logger timeout
-    :param included_peers: list of peers to include in logging
-    :param excluded_peers: list of peers to exclude from logging
-    """
-    # params = {
-    #     "blocks_path": "app/data/blocks/3node_net.bintree.50k.json",
-    #     "bps": 1000
-    # }
     block_lists = get_blocks_from_disk(params)
     sp = SocketPublish(params)
     messages, hashes = sp.flatten_messages(block_lists)
 
     loggers = await create_loggers(hashes, logger_type, logger_timeout,
-                                   included_peers, excluded_peers)
+                                   included_peers, excluded_peers,
+                                   logger_expected_count)
+
     enable_logging_task = asyncio.create_task(start_loggers(loggers))
     sp_task = asyncio.create_task(sp.run(messages))
 
@@ -103,7 +96,7 @@ async def xnolib_publish(params: dict,
 
 
 def read_blocks_from_disk(path, seeds=False, hashes=False, blocks=False):
-    res = ConfigReadWrite().read_json(path)
+    res = ConfigReadWrite(os.environ.get("NL_APP_DIR", ".")).read_json(path)
     if seeds: return res["s"]
     if hashes: return res["h"]
     if blocks: return res["b"]
@@ -132,7 +125,6 @@ def get_block_subset(all_blocks: dict, start_round: int, end_round: int,
         x[start_index:end_index]
         for x in all_blocks['h'][start_round:end_round]
     ]
-
     return blocks
 
 
@@ -193,7 +185,8 @@ class SocketPublish:
             return str(self.hdr) + "\n" + str(self.block)
 
     def get_xnolib_context(self, peers=None):
-        ctx = ConfigParser().get_xnolib_localctx()
+        ctx = ConfigParser(os.environ.get("NL_APP_DIR",
+                                          ".")).get_xnolib_localctx()
         ctx["net_id"] = network_id(ord('X'))
 
         if peers is not None:  # chose a single peer , if enabled in config file
@@ -301,4 +294,9 @@ class SocketPublish:
     async def run(self, messages: List[Any]) -> int:
         tasks = self.create_publish_tasks(self.sockets, messages)
         await asyncio.gather(*tasks)
-        return len(messages)
+        # make sure the last few blocks are published.
+        #ideally this would check if all messages are received
+        await asyncio.sleep(15)
+
+        message_count = len(messages)
+        return message_count

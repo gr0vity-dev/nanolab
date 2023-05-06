@@ -3,7 +3,7 @@
     "commands": [
         {
             "type": "python",
-            "class": "NodeCommands",
+            "class": "NodeInteraction",
             "method": "non_existent_method"
         }
     ]

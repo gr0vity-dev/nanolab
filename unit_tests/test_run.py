@@ -5,12 +5,12 @@ import os
 import io
 from pathlib import Path
 from unittest.mock import patch
-import run
+import nanolab.main as run
 import pytest
 from argparse import Namespace
 
 
-#@patch decorator is used to replace 'app.run.NodeCommands' with the following TestClass
+#@patch decorator is used to replace 'app.run.NodeInteraction' with the following TestClass
 class TestClass:
 
     def long_running_method(self, duration=1):
@@ -57,13 +57,11 @@ class TestRun(unittest.TestCase):
 
         self.assertIn(expected_substring, output)
 
-    #@patch('app.pycmd.NodeCommands', new=TestClass)
     def test_invalid_type(self):
         self.load_config_to_env('unit_tests/test_configs/invalid_type.json')
         expected_message = "Invalid command type 'invalid' at index 0 in 'commands'"
         self.match_expected_error(ValueError, expected_message)
 
-    #@patch('app.pycmd.NodeCommands', new=TestClass)
     def test_invalid_snippet_key(self):
         self.load_config_to_env(
             'unit_tests/test_configs/invalid_snippet_key.json')
@@ -72,7 +70,7 @@ class TestRun(unittest.TestCase):
 
     def test_invalid_method(self):
         self.load_config_to_env('unit_tests/test_configs/invalid_method.json')
-        expected_message = "Python command 0: Method 'non_existent_method' not found in class 'NodeCommands'."
+        expected_message = "Python command 0: Method 'non_existent_method' not found in class 'NodeInteraction'."
         self.match_expected_error(ValueError, expected_message)
 
     def test_invalid_snippet_missing_mandatory_var(self):
@@ -82,7 +80,6 @@ class TestRun(unittest.TestCase):
         expected_message = "'Missing value(s) for mandatory variable(s): unused_mandatory_var'"
         self.match_expected_error(KeyError, expected_message)
 
-    #@patch('app.pycmd.NodeCommands', new=TestClass)
     def test_threaded_parallel(self):
         start_time = time.time()
         self.load_config_to_env(

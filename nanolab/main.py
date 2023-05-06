@@ -7,9 +7,12 @@ import threading
 from collections import defaultdict
 import inspect
 import argparse
-from app import pycmd
+from nanolab import pycmd
+import logging
 
-default_class = "NodeCommands"
+default_class = "NodeInteraction"
+
+logger = logging.getLogger(__name__)
 
 
 def load_json(file_path):
@@ -32,6 +35,7 @@ def parse_args():
 def load_resolved_path(arg_value, env_var, default_path):
     config_path = arg_value if arg_value else os.environ.get(
         env_var, default_path)
+    logger.info("path is %s", config_path)
     return load_json(config_path)
 
 
@@ -150,7 +154,7 @@ def execute_snippet(command_config, snippets):
 
 
 def execute_python(command_config):
-    class_name = command_config.get("class", "NodeCommands")
+    class_name = command_config.get("class", default_class)
     cls = getattr(pycmd, class_name)
     instance = cls(**command_config.get('constructor_params', {}))
 
@@ -204,6 +208,12 @@ def execute_command_sequence(commands):
     for command_config in commands:
         if command_config['type'] == 'python':
             execute_python(command_config)
+        elif command_config['type'] == 'bash':
+            execute_bash(command_config)
+        else:
+            raise ValueError(
+                f"{command_config['type']} not supported for sequenced execution"
+            )
 
 
 def execute_threaded(commands):
@@ -249,7 +259,7 @@ def execute_command(command_config, snippets):
 def load_and_validate_configs(args):
 
     default_config_path = 'config.example.json'
-    default_snippets_path = 'app/snippets.json'
+    default_snippets_path = 'nanolab/snippets.json'
 
     config = load_resolved_path(args.config, "CONFIG_FILE",
                                 default_config_path)
@@ -271,11 +281,11 @@ def execute_commands(config, snippets):
             execute_command(command_config, snippets)
 
 
-def main(args=None):
-
+def main():
+    args = parse_args()
     config, snippets = load_and_validate_configs(args)
     execute_commands(config, snippets)
 
 
 if __name__ == "__main__":
-    main(parse_args())
+    main()

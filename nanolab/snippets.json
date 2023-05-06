@@ -9,31 +9,31 @@
         "commands": [
             {
                 "type": "bash",
-                "command": "./nl_run down "
+                "command": "nanomock down "
             },
             {
                 "type": "bash",
-                "command": "cp {NL_CONFIG} submodules/nanolocal/nanolocal/nl_config.toml"
+                "command": "cp {NL_CONFIG} ./nl_config.toml"
             },
             {
                 "type": "bash",
-                "command": "./nl_run conf_edit --nested_path remote_address --value {REMOTE_IP}"
+                "command": "nanomock conf_edit --nested_path remote_address --value {REMOTE_IP}"
             },
             {
                 "type": "bash",
-                "command": "./nl_run conf_edit --nested_path representatives.docker_tag --value {docker_tag}"
+                "command": "#nanomock conf_edit --nested_path representatives.docker_tag --value {docker_tag}"
             },
             {
                 "type": "bash",
-                "command": "./nl_run create && ./nl_run reset"
+                "command": "nanomock create && nanomock reset"
             },
             {
                 "type": "bash",
-                "command": "for i in {SETUP_NODES}; do cp {LEDGER} submodules/nanolocal/nanolocal/nano_nodes/$i/NanoTest/data.ldb; done"
+                "command": "for i in {SETUP_NODES}; do cp {LEDGER} ./nano_nodes/$i/NanoTest/data.ldb; done"
             },
             {
                 "type": "bash",
-                "command": "./nl_run start && ./nl_run init_wallets"
+                "command": "nanomock start && nanomock init_wallets"
             }
         ]
     },
@@ -46,23 +46,23 @@
         "commands": [
             {
                 "type": "bash",
-                "command": "./nl_run down"
+                "command": "nanomock down"
             },
             {
                 "type": "bash",
-                "command": "cp {NL_CONFIG} submodules/nanolocal/nanolocal/nl_config.toml"
+                "command": "cp {NL_CONFIG} ./nl_config.toml"
             },
             {
                 "type": "bash",
-                "command": "./nl_run conf_edit --nested_path remote_address --value {REMOTE_IP}"
+                "command": "#nanomock conf_edit --nested_path remote_address --value {REMOTE_IP}"
             },
             {
                 "type": "bash",
-                "command": "./nl_run conf_edit --nested_path representatives.docker_tag --value {docker_tag}"
+                "command": "#nanomock conf_edit --nested_path representatives.docker_tag --value {docker_tag}"
             },            
             {
                 "type": "bash",
-                "command": "./nl_run create && ./nl_run reset && ./nl_run start && ./nl_run init && ./nl_run restart_wait_sync"
+                "command": "nanomock create && nanomock reset && nanomock start && nanomock init && nanomock restart_wait_sync"
             }
         ]
     }

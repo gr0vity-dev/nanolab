@@ -3,7 +3,7 @@
 import struct
 import binascii
 
-from submodules.xnomin.peers import message_header, message_type, message_type_enum
+from nanolab.xnomin.peers import message_header, message_type, message_type_enum
 
 
 class telemetry_req:

@@ -1,4 +1,0 @@
-#!/bin/bash
-cd submodules/nanolocal
-./nl_run.py "$@"
-cd - > /dev/null

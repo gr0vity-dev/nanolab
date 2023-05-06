@@ -1,4 +1,4 @@
-from submodules.xnomin.peers import message_header, ed25519_blake2b, socket, hexlify, message_type
+from nanolab.xnomin.peers import message_header, ed25519_blake2b, socket, hexlify, message_type
 from secrets import token_bytes
 from typing import Tuple
 

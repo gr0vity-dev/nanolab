@@ -29,7 +29,7 @@ class TestRun(unittest.TestCase):
 
     def load_config_to_env(self, config_path):
         os.environ["CONFIG_FILE"] = str(config_path)
-        os.environ["SNIPPET_FILE"] = "unit_tests/test_snippets.json"
+        #os.environ["SNIPPET_FILE"] = "unit_tests/test_snippets.json"
 
     def match_expected_error(self, error_type, expected_message):
         with self.assertRaises(error_type) as cm:
@@ -70,7 +70,7 @@ class TestRun(unittest.TestCase):
 
     def test_invalid_method(self):
         self.load_config_to_env('unit_tests/test_configs/invalid_method.json')
-        expected_message = "Python command 0: Method 'non_existent_method' not found in class 'NodeInteraction'."
+        expected_message = "Python command: Method 'non_existent_method' not found in class 'NodeInteraction'."
         self.match_expected_error(ValueError, expected_message)
 
     def test_invalid_snippet_missing_mandatory_var(self):
@@ -121,11 +121,10 @@ class TestRun(unittest.TestCase):
         expected_output = "file test.txt"
         self.match_expected_output(expected_output)
 
-    @pytest.mark.nanolocal
-    def test_nanolocal_down(self):
-        self.load_config_to_env('unit_tests/test_configs/nanolocal_down.json')
-        expected_output = "[SUCCESS] - all containers removed"
-        self.contains_expected_substring(expected_output)
+    def test_docker_tags(self):
+        self.load_config_to_env('unit_tests/test_configs/docker_tags.json')
+        expected_output = "tag1nanocurrency/nano:V24.0"
+        self.match_expected_output(expected_output)
 
 
 if __name__ == '__main__':

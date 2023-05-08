@@ -1,16 +1,11 @@
-import os
-
-os.environ["NL_APP_DIR"] = "."
-
 from nanolab.xnomin.peers import get_connected_socket_endpoint, message_header, block_state, block_type_enum, message_type_enum, network_id, message_type, get_peers_from_service
 from nanolab.xnomin.handshake import node_handshake_id
-
-from nanomock.modules.nl_parse_config import ConfigParser, ConfigReadWrite
+from nanomock.modules.nl_parse_config import ConfigReadWrite
 from nanomock.modules.nl_rpc import NanoRpc
 from nanolab.node_tools import StatsLogger
 from nanolab.decorators import ensure_duration
-
-from typing import Any, Dict, List, Optional
+from nanolab.src.utils import get_config_parser
+from typing import Any, Dict, List
 import asyncio
 import random
 import time
@@ -19,8 +14,7 @@ import itertools
 
 def load_nodes_config():
     """Load nodes configuration from a file."""
-    config_parser = ConfigParser(os.environ.get("NL_APP_DIR", "."))
-    return config_parser.get_nodes_config()
+    return get_config_parser().get_nodes_config()
 
 
 async def create_logger(node, logger_type, hashes, logger_timeout,
@@ -96,7 +90,7 @@ async def xnolib_publish(params: dict,
 
 
 def read_blocks_from_disk(path, seeds=False, hashes=False, blocks=False):
-    res = ConfigReadWrite(os.environ.get("NL_APP_DIR", ".")).read_json(path)
+    res = ConfigReadWrite().read_json(path)
     if seeds: return res["s"]
     if hashes: return res["h"]
     if blocks: return res["b"]
@@ -185,8 +179,7 @@ class SocketPublish:
             return str(self.hdr) + "\n" + str(self.block)
 
     def get_xnolib_context(self, peers=None):
-        ctx = ConfigParser(os.environ.get("NL_APP_DIR",
-                                          ".")).get_xnolib_localctx()
+        ctx = get_config_parser().get_xnolib_localctx()
         ctx["net_id"] = network_id(ord('X'))
 
         if peers is not None:  # chose a single peer , if enabled in config file

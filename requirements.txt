@@ -1,4 +1,5 @@
 pytest
+nanolab>=0.0.10
 # pyblake2==1.1.0
 # ed25519-blake2b
 # jsonpickle
@@ -10,4 +11,4 @@ pytest
 # extradict
 # gmpy2
 # aiohttp
-nano_local==0.1.5
+#nano_local==0.1.5

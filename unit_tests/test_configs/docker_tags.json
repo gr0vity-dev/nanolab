@@ -1,0 +1,10 @@
+{
+    "testcase" : "uittest",
+    "docker_tags" : ["tag1", "nanocurrency/nano:V24.0"],
+    "commands": [
+        {
+            "type": "bash",
+            "command":  "echo {docker_tag}"
+        }
+    ]
+}

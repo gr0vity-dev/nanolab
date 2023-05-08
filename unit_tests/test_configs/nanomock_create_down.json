@@ -1,0 +1,18 @@
+{
+    "testcase" : "uittest",
+    "docker_tags" : ["nanocurrency/nano:V24.0"],
+    "commands": [
+        {
+            "type": "bash",
+            "command":  "nanomock create"
+        },
+        {
+            "type": "bash",
+            "command":  "nanomock down"
+        },
+        {
+            "type": "bash",
+            "command":  "nanomock destroy"
+        }
+    ]
+}

@@ -17,12 +17,12 @@
             },
             {
                 "type": "bash",
-                "command": "nanomock conf_edit --nested_path remote_address --value {REMOTE_IP}"
+                "command": "nanomock conf_edit --payload '{{\"path\" : \".\",  \"value\"  \"{REMOTE_IP}\"}}'"
             },
             {
                 "type": "bash",
-                "command": "#nanomock conf_edit --nested_path representatives.docker_tag --value {docker_tag}"
-            },
+                "command": "#nanomock conf_edit --payload '{{\"path\" : \"representatives.docker_tag\",  \"value\"  \"{docker_tag}\"}}'"
+            },          
             {
                 "type": "bash",
                 "command": "nanomock create && nanomock reset"
@@ -54,12 +54,12 @@
             },
             {
                 "type": "bash",
-                "command": "#nanomock conf_edit --nested_path remote_address --value {REMOTE_IP}"
+                "command": "nanomock conf_edit --payload '{\"nested_path\" : \".\",  \"value\"  \"{{REMOTE_IP}}\"}'"
             },
             {
                 "type": "bash",
-                "command": "#nanomock conf_edit --nested_path representatives.docker_tag --value {docker_tag}"
-            },            
+                "command": "#nanomock conf_edit --payload '{\"nested_path\" : \"representatives.docker_tag\",  \"value\"  \"{{docker_tag}}\"}'"
+            },           
             {
                 "type": "bash",
                 "command": "nanomock create && nanomock reset && nanomock start && nanomock init && nanomock restart_wait_sync"

@@ -1,6 +1,6 @@
 {
     "docker_tags": [
-        "db35_rev_a302_fde8", "nanocurrency/nano-beta:V25.0DB35"
+        "nanocurrency/nano-beta:V25.0DB35"
     ],
     "commands": [
         {

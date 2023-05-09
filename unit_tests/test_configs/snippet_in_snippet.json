@@ -1,5 +1,5 @@
 {
-    "testcase" : "uittest",
+    "testcase" : "snippet_in_snippet",
     "docker_tags" : ["nanocurrency/nano:V24.0"],
     "commands": [
         {

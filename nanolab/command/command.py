@@ -41,6 +41,7 @@ class Command:
         self.mixin.validate()
 
     def execute(self):
+        if self.command_config.get("skip"): return
         self.mixin.execute()
 
     def execute_another_command(self, command_config):

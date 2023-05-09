@@ -1,5 +1,5 @@
 {
-    "testcase" : "uittest",
+    "testcase" : "threaded_with_group",
     "docker_tags" : ["tag1"],
     "commands": [
         {
@@ -7,35 +7,35 @@
             "commands": [
                 {
                     "type": "python",
-                    "class": "TestClass",
+                    "class": "TestClass",                    
                     "method": "long_running_method",
-                    "variables" : {"duration" : 0.1} 
+                    "variables" : {"duration" : 1} 
                 },
                 {
                     "type": "python",
-                    "class": "TestClass",
+                    "class": "TestClass",                    
                     "method": "long_running_method",
-                    "variables" : {"duration" : 0.1} 
-                },
-                {
-                    "type": "python",
-                    "class": "TestClass",
-                    "group": "g1",
-                    "method": "long_running_method",
-                    "variables" : {"duration" : 0.1} 
+                    "variables" : {"duration" : 1} 
                 },
                 {
                     "type": "python",
                     "class": "TestClass",
                     "group": "g1",
                     "method": "long_running_method",
-                    "variables" : {"duration" : 0.1} 
+                    "variables" : {"duration" : 1} 
+                },
+                {
+                    "type": "python",
+                    "class": "TestClass",
+                    "group": "g1",
+                    "method": "long_running_method",
+                    "variables" : {"duration" : 1} 
                 },
                 {
                     "type": "python",
                     "class": "TestClass",
                     "method": "long_running_method",
-                    "variables" : {"duration" : 0.1} 
+                    "variables" : {"duration" : 1} 
                 }
             ]
         }

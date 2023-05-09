@@ -1,5 +1,5 @@
 {
-    "testcase" : "uittest",
+    "testcase" : "invalid_type",
     "docker_tags" : ["tag1"],
     "commands": [
         {

@@ -1,5 +1,6 @@
 .vscode/
 build/
+resources/
 **egg-info**
 nano_nodes/
 **/*pycache*

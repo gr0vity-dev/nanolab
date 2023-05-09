@@ -1,5 +1,5 @@
 {
-    "testcase" : "uittest",
+    "testcase" : "docker_tags",
     "docker_tags" : ["tag1", "nanocurrency/nano:V24.0"],
     "commands": [
         {

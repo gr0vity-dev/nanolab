@@ -9,19 +9,19 @@
         "commands": [
             {
                 "type": "bash",
-                "command": "nanomock down "
+                "command": "nanomock down"
+            },
+            {
+                "type": "bash",               
+                "command": "cp {NL_CONFIG}  ./nl_config.toml"
             },
             {
                 "type": "bash",
-                "command": "cp {NL_CONFIG} ./nl_config.toml"
+                "command": "nanomock conf_edit --payload '{{\"path\" : \"remote_address\",  \"value\" : \"{REMOTE_IP}\"}}'"
             },
             {
                 "type": "bash",
-                "command": "nanomock conf_edit --payload '{{\"path\" : \".\",  \"value\"  \"{REMOTE_IP}\"}}'"
-            },
-            {
-                "type": "bash",
-                "command": "#nanomock conf_edit --payload '{{\"path\" : \"representatives.docker_tag\",  \"value\"  \"{docker_tag}\"}}'"
+                "command": "#nanomock conf_edit --payload '{{\"path\" : \"representatives.docker_tag\",  \"value\" : \"{docker_tag}\"}}'"
             },          
             {
                 "type": "bash",
@@ -49,16 +49,16 @@
                 "command": "nanomock down"
             },
             {
-                "type": "bash",
+                "type": "bash",                
                 "command": "cp {NL_CONFIG} ./nl_config.toml"
             },
             {
                 "type": "bash",
-                "command": "nanomock conf_edit --payload '{\"nested_path\" : \".\",  \"value\"  \"{{REMOTE_IP}}\"}'"
+                "command": "nanomock conf_edit --payload '{\"nested_path\" : \"remote_address\",  \"value\" : \"{{REMOTE_IP}}\"}'"
             },
             {
                 "type": "bash",
-                "command": "#nanomock conf_edit --payload '{\"nested_path\" : \"representatives.docker_tag\",  \"value\"  \"{{docker_tag}}\"}'"
+                "command": "#nanomock conf_edit --payload '{\"nested_path\" : \"representatives.docker_tag\",  \"value\" : \"{{docker_tag}}\"}'"
             },           
             {
                 "type": "bash",

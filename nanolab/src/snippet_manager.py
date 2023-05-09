@@ -14,9 +14,12 @@ class SnippetManager:
         snippet_files = list(self.snippet_folder.glob("*.json"))
 
         for snippet_file in snippet_files:
-            snippets = self.conf_rw.read_json(snippet_file)
-            for snippet_key, snippet_value in snippets.items():
-                self.snippets[snippet_key] = snippet_value
+            try:
+                snippets = self.conf_rw.read_json(snippet_file)
+                for snippet_key, snippet_value in snippets.items():
+                    self.snippets[snippet_key] = snippet_value
+            except Exception as exc:
+                print(f"Failed to load snippets from {snippet_file}")
 
     def get_snippets(self):
         return self.snippets

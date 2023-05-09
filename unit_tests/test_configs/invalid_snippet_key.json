@@ -1,5 +1,5 @@
 {
-    "testcase" : "uittest",
+    "testcase" : "invalid_snippet_key",
     "docker_tags" : ["tag1"],
     "commands": [
         {

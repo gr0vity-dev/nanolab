@@ -20,7 +20,7 @@ def parse_args():
     # Run command
     run_parser = subparsers.add_parser("run", help="Run a testcase")
     run_parser.add_argument('-t', '--testcase', type=str, help='Testcase name')
-    run_parser.add_argument('-i', '--image', type=str, help='Docker image')
+    run_parser.add_argument('-i', '--image', nargs='+', help='Docker image(s)')
     run_parser.add_argument('--gh-user',
                             type=str,
                             default='gr0vity-dev',
@@ -107,6 +107,8 @@ class ArgParseHandler:
         #resolve and downlaod resources defiend in the config
         resolved_config = resource_handler.download_and_replace_resources(
             config_path, path_handler.downloads_path)
+        #replace docker_tags with commandline
+        if self.args.image: resolved_config["docker_tags"] = self.args.image
 
         self.conf_rw.write_json(path_handler.resolved_config_file_path,
                                 resolved_config)

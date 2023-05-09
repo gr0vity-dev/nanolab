@@ -22,5 +22,6 @@ class BashCommandMixin(CommandMixinBase):
                 f"Error executing command: {command}\nError: {process.stderr.strip()}"
             )
         else:
-            response = process.stdout.strip() or process.stderr.strip()
+            response = process.stdout.strip() or process.stderr.strip(
+            ) or command
             print(response)

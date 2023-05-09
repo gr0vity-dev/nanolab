@@ -9,11 +9,11 @@
         "commands": [
             {
                 "type": "bash",
-                "command": "nanomock down"
+                "command": "[ -f nl_config.toml ] && nanomock down || true"
             },
             {
                 "type": "bash",               
-                "command": "cp {NL_CONFIG}  ./nl_config.toml"
+                "command": "cp {NL_CONFIG} nl_config.toml"
             },
             {
                 "type": "bash",
@@ -21,7 +21,7 @@
             },
             {
                 "type": "bash",
-                "command": "#nanomock conf_edit --payload '{{\"path\" : \"representatives.docker_tag\",  \"value\" : \"{docker_tag}\"}}'"
+                "command": "nanomock conf_edit --payload '{{\"path\" : \"representatives.docker_tag\",  \"value\" : \"{docker_tag}\"}}'"
             },          
             {
                 "type": "bash",
@@ -46,11 +46,11 @@
         "commands": [
             {
                 "type": "bash",
-                "command": "nanomock down"
+                "command": "[ -f nl_config.toml ] && nanomock down || true"
             },
             {
                 "type": "bash",                
-                "command": "cp {NL_CONFIG} ./nl_config.toml"
+                "command": "cp {NL_CONFIG} nl_config.toml"
             },
             {
                 "type": "bash",
@@ -58,7 +58,7 @@
             },
             {
                 "type": "bash",
-                "command": "#nanomock conf_edit --payload '{\"nested_path\" : \"representatives.docker_tag\",  \"value\" : \"{{docker_tag}}\"}'"
+                "command": "nanomock conf_edit --payload '{\"nested_path\" : \"representatives.docker_tag\",  \"value\" : \"{{docker_tag}}\"}'"
             },           
             {
                 "type": "bash",

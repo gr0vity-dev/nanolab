@@ -4,6 +4,7 @@ from io import StringIO
 from unittest.mock import patch
 import unittest
 import nanolab.main as run
+import shutil
 
 tc = unittest.TestCase()
 
@@ -36,3 +37,10 @@ def contains_expected_substring(expected_substring):
     output = captured_output.getvalue().replace("\r", "").replace("\n", "")
 
     tc.assertIn(expected_substring, output)
+
+
+def remove_nanolab_resources():
+    if os.path.exists("./unit_tests/snippets"):
+        shutil.rmtree("./unit_tests/snippets")
+    if os.path.exists("./unit_tests/resources"):
+        shutil.rmtree("./unit_tests/resources")

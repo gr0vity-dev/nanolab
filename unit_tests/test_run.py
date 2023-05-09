@@ -3,25 +3,27 @@ import time
 import os
 from unittest.mock import patch
 import nanolab.main as run
-from unit_tests.utils import match_expected_error, match_expected_output
-import shutil
+from unit_tests.utils import match_expected_error, match_expected_output, contains_expected_substring, remove_nanolab_resources
+
 from pathlib import Path
+import pytest
+
+os.environ["NL_PATH"] = "unit_tests"
+
+
+@pytest.fixture(scope="module", autouse=True)
+def setup_and_teardown():
+    # Setup code
+    remove_nanolab_resources()
+    print("Setup for all tests in the module")
+    yield
+
+    # Teardown code
+    remove_nanolab_resources()
+    print("Teardown for all tests in the module")
 
 
 class TestRun(unittest.TestCase):
-
-    def setUp(self):
-        os.environ["NL_PATH"] = "unit_tests"
-
-    def tearDown(self):
-        snippets_dir = Path.cwd() / 'unit_tests' / 'snippets'
-        resources_dir = Path.cwd() / 'unit_tests' / 'resources'
-
-        if snippets_dir.exists():
-            shutil.rmtree(str(snippets_dir))
-
-        if resources_dir.exists():
-            shutil.rmtree(str(resources_dir))
 
     @patch('sys.argv', [
         'nanolab', 'run', '--testcase',
@@ -116,6 +118,16 @@ class TestRun(unittest.TestCase):
     def test_docker_tags(self):
         expected_output = "tag1\nnanocurrency/nano:V24.0"
         match_expected_output(expected_output)
+
+    @patch('sys.argv', [
+        'nanolab', 'run', '--testcase',
+        'unit_tests/test_configs/nanomock_create_down.json'
+    ])
+    def test_nanolocal_create(self):
+        os.environ["NL_CONF_DIR"] = "unit_tests/nanomock"
+        os.environ["NL_CONF_FILE"] = "nl_config.toml"
+        expected_output = "SUCCESS: 2 containers have been removed"
+        contains_expected_substring(expected_output)
 
 
 if __name__ == '__main__':

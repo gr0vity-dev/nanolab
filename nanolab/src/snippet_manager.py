@@ -1,5 +1,8 @@
 from nanomock.modules.nl_parse_config import ConfigReadWrite
 from pathlib import Path
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class SnippetManager:
@@ -19,7 +22,7 @@ class SnippetManager:
                 for snippet_key, snippet_value in snippets.items():
                     self.snippets[snippet_key] = snippet_value
             except Exception as exc:
-                print(f"Failed to load snippets from {snippet_file}")
+                logger.info(f"Failed to load snippets from {snippet_file}")
 
     def get_snippets(self):
         return self.snippets

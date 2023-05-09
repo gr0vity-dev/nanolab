@@ -4,7 +4,6 @@ import requests
 from nanomock.modules.nl_parse_config import ConfigReadWrite
 from .snippet_manager import SnippetManager
 from nanolab.command.command_validator import CommandValidator
-from nanolab.src.utils import wait_for_file
 
 
 class TestcaseConfig:
@@ -21,9 +20,6 @@ class TestcaseConfig:
         config_path = config_path if config_path else os.environ.get(
             env_var, default_path)
 
-        # Wait for the file to be written completely.
-        wait_for_file(config_path, timeout=1)
-
         return self.conf_rw.read_json(config_path)
 
     def _load_config(self, config_path: str) -> dict:
@@ -34,11 +30,6 @@ class TestcaseConfig:
         testcase_name = self.config["testcase"]
         global_variables = self.config.get("global", {})
 
-        # Handle downloading or copying global files
-        for key, value in global_variables.items():
-            global_variables[key] = self._handle_path_or_url(
-                testcase_name, value)
-
         # Replace global variables in the commands section
         for command in self.config["commands"]:
             self._apply_variables_to_command(global_variables, command)
@@ -46,13 +37,6 @@ class TestcaseConfig:
     def _set_default_class(self, command):
         if command.get("type") in ["python"]:
             command.setdefault("class", self.default_command_executor)
-
-    def _handle_path_or_url(self, testcase_name: str, value: str) -> str:
-        if value.startswith("http://") or value.startswith("https://"):
-            destination = self._download_url(testcase_name, value)
-        else:
-            destination = self._copy_path(testcase_name, value)
-        return destination
 
     def complete_config(self):
         for command in self.config["commands"]:
@@ -90,40 +74,18 @@ class TestcaseConfig:
                         f"Missing 'key' for snippet command at index {idx} in 'commands'"
                     )
 
-    def _download_url(self, testcase_name: str, url: str) -> str:
-        url = url.strip()
-        filename = os.path.basename(url)
-        destination = f"./resources/{testcase_name}/{filename}"
-        print("DEBUG", destination, url)
-        os.makedirs(os.path.dirname(destination), exist_ok=True)
-
-        if not os.path.exists(destination):
-            response = requests.get(url)
-            with open(destination, "wb") as f:
-                f.write(response.content)
-
-        return destination
-
-    def _copy_path(self, testcase_name: str, path: str) -> str:
-        filename = os.path.basename(path)
-        destination = f"./resources/{testcase_name}/{filename}"
-        os.makedirs(os.path.dirname(destination), exist_ok=True)
-
-        if not os.path.exists(destination):
-            shutil.copy(path, destination)
-        return destination
-
     def _apply_variables_to_command(self, global_variables: dict,
                                     command: dict):
-        for key, value in command.get("variables", {}).items():
-            if isinstance(value, str):
-                command["variables"][key] = self._replace_global_variables(
-                    global_variables, value)
-            elif isinstance(value, dict):
-                for sub_key, sub_value in value.items():
-                    if isinstance(sub_value, str):
-                        value[sub_key] = self._replace_global_variables(
-                            global_variables, sub_value)
+        if isinstance(command, dict):
+            for key, value in command.items():
+                if isinstance(value, str):
+                    command[key] = self._replace_global_variables(
+                        global_variables, value)
+                else:
+                    self._apply_variables_to_command(global_variables, value)
+        elif isinstance(command, list):
+            for item in command:
+                self._apply_variables_to_command(global_variables, item)
 
     def _replace_global_variables(self, global_variables: dict,
                                   value: str) -> str:

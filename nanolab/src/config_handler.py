@@ -52,26 +52,6 @@ class ConfigPathHandler:
     def get_resolved_config_path(self):
         return self.resolved_config_file_path
 
-    def download_config_file(self, config_data: str) -> str:
-        return self.download_data(config_data, "config.json")
-
-    def download_url(self, url: str) -> str:
-        return self.download_data(url.strip(), Path(url).name)
-
-    def download_data(self, data: str, filename: str) -> str:
-        destination = self.resources_path / filename
-
-        if not destination.exists():
-            if data.startswith("http://") or data.startswith("https://"):
-                response = requests.get(data)
-                with destination.open("wb") as f:
-                    f.write(response.content)
-            else:
-                with destination.open("w") as f:
-                    f.write(data)
-
-        return destination
-
     def _copy_path(self, path: str) -> str:
         filename = Path(path).name
         destination = self.resources_path / filename
@@ -80,34 +60,6 @@ class ConfigPathHandler:
         if copy_files.lower() == "true" and not destination.exists():
             shutil.copy(path, destination)
         return destination
-
-
-# class ConfigResourceResolver():
-
-#     def __init__(self):
-#         pass
-
-#     def replace_resources(self, config: dict, destination_path: Path):
-#         global_resources = config.get("global", {})
-#         updated_global_resources = {}
-
-#         for key, value in global_resources.items():
-#             if value.startswith("http://") or value.startswith("https://"):
-#                 # Replace the URL with "{destination}/{filename}"
-#                 filename = Path(value).name
-#                 updated_global_resources[
-#                     key] = f"{destination_path}/{filename}"
-#             elif environ.get("NL_COPY_FILES").lower() == "true":
-#                 # Replace the local file with "{destination}/{filename}"
-#                 filename = Path(value).name
-#                 updated_global_resources[
-#                     key] = f"{destination_path}/{filename}"
-#             else:
-#                 # Keep the local path unchanged
-#                 updated_global_resources[key] = value
-
-#         config["global"] = updated_global_resources
-#         return config
 
 
 class ConfigResourceHandler():
@@ -134,7 +86,8 @@ class ConfigResourceHandler():
                 downloaded_path = self._download_url(value, destination_path)
                 # Replace the URL with the downloaded file path
                 global_resources[key] = str(downloaded_path)
-            elif environ.get("NL_COPY_FILES").lower() == "true":
+            elif environ.get("NL_COPY_FILES") and environ.get(
+                    "NL_COPY_FILES").lower() == "true":
                 # Copy the local file to the destination
                 copied_path = self._copy_path(
                     value, destination_path / Path(value).name)

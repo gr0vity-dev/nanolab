@@ -1,12 +1,12 @@
 import unittest
-import time
 import os
-from unittest.mock import patch
+import shutil
 import nanolab.main as run
-from unit_tests.utils import match_expected_error, match_expected_output, contains_expected_substring, remove_nanolab_resources
-
-from pathlib import Path
 import pytest
+import time
+
+from io import StringIO
+from unittest.mock import patch
 
 os.environ["NL_PATH"] = "unit_tests"
 
@@ -21,6 +21,46 @@ def setup_and_teardown():
     # Teardown code
     remove_nanolab_resources()
     print("Teardown for all tests in the module")
+
+
+tc = unittest.TestCase()
+
+
+def match_expected_error(error_type, expected_message):
+    with tc.assertRaises(error_type) as cm:
+        run.main()
+
+    tc.assertEqual(str(cm.exception), expected_message)
+
+
+def match_expected_output(expected_output):
+    captured_output = StringIO()
+    # Replace sys.stdout with captured_output within the context
+    with patch('sys.stdout', captured_output):
+        run.main()
+
+    # Get the captured output as a string
+    # output = captured_output.getvalue().replace("\r", "").replace("\n", "")
+    output = captured_output.getvalue().strip()
+
+    tc.assertEqual(output, expected_output)
+
+
+def contains_expected_substring(expected_substring):
+    captured_output = StringIO()
+    with patch('sys.stdout', captured_output):
+        run.main()
+    # Get the captured output as a string
+    output = captured_output.getvalue().replace("\r", "").replace("\n", "")
+
+    tc.assertIn(expected_substring, output)
+
+
+def remove_nanolab_resources():
+    if os.path.exists("./unit_tests/snippets"):
+        shutil.rmtree("./unit_tests/snippets")
+    if os.path.exists("./unit_tests/resources"):
+        shutil.rmtree("./unit_tests/resources")
 
 
 class TestRun(unittest.TestCase):
@@ -127,6 +167,22 @@ class TestRun(unittest.TestCase):
         os.environ["NL_CONF_DIR"] = "unit_tests/nanomock"
         os.environ["NL_CONF_FILE"] = "nl_config.toml"
         expected_output = "SUCCESS: 2 containers have been removed"
+        contains_expected_substring(expected_output)
+
+    @patch('sys.argv', [
+        'nanolab', 'run', '--testcase',
+        'unit_tests/test_configs/globals_resolve_url.json'
+    ])
+    def test_resolve_url(self):
+        expected_output = "mDMEXZTdLxYJKwYBBAHaRw8BAQdAPXgGtAVcgz+RNJRvSgk1YrV5bzEY"
+        contains_expected_substring(expected_output)
+
+    @patch('sys.argv', [
+        'nanolab', 'run', '--testcase',
+        'unit_tests/test_configs/globals_resolve_path.json'
+    ])
+    def test_resolve_path(self):
+        expected_output = "globals_resolve_path"
         contains_expected_substring(expected_output)
 
 

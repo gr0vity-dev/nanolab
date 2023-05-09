@@ -1,0 +1,13 @@
+{
+    "testcase" : "globals_resolve_url",
+    "docker_tags" : ["tag1"],
+    "global": {
+        "EXAMPLE_COM": "https://raw.githubusercontent.com/nanocurrency/nano-node/18ca7bb95da68af4b9c6edc12c5a7e57ea1cec66/etc/gpg/clemahieu.asc"
+    },
+    "commands": [
+        {
+            "type": "bash",
+            "command":  "cat {EXAMPLE_COM}"
+        }
+    ]
+}

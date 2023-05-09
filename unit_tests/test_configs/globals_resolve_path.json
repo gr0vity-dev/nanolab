@@ -1,0 +1,13 @@
+{
+    "testcase" : "globals_resolve_path",
+    "docker_tags" : ["tag1"],
+    "global": {
+        "PATH_TO_THIS_FILE": "unit_tests/test_configs/globals_resolve_path.json"
+    },
+    "commands": [
+        {
+            "type": "bash",
+            "command":  "cat {PATH_TO_THIS_FILE}"
+        }
+    ]
+}

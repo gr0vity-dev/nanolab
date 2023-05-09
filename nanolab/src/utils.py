@@ -11,15 +11,21 @@ import filecmp
 logger = logging.getLogger(__name__)
 
 
-def copy_if_changed(src_dir, dst_dir):
-    for src_root, dirs, files in walk(src_dir):
+def _copy_changed_files(src_file: str, dst_file: str):
+    """Copy files from source to destination if they have changed."""
+    if not path.exists(dst_file) or not filecmp.cmp(
+            src_file, dst_file, shallow=False):
+        shutil.copy2(src_file, dst_file)
+
+
+def _walk_and_copy(src_dir: str, dst_dir: str):
+    """Walk through the source directory and copy changed files to destination."""
+    for src_root, _, files in walk(src_dir):
         dst_root = src_root.replace(src_dir, dst_dir, 1)
         for file in files:
             src_file = path.join(src_root, file)
             dst_file = path.join(dst_root, file)
-            if not path.exists(dst_file) or not filecmp.cmp(
-                    src_file, dst_file, shallow=False):
-                shutil.copy2(src_file, dst_file)
+            _copy_changed_files(src_file, dst_file)
 
 
 def extract_packaged_data_to_disk(snippets_path):
@@ -29,9 +35,9 @@ def extract_packaged_data_to_disk(snippets_path):
 
         if src_dir.exists():
             dest_dir.mkdir(parents=True, exist_ok=True)
-            copy_if_changed(str(src_dir), str(dest_dir))
+            _walk_and_copy(str(src_dir), str(dest_dir))
             logger.info(
-                "nanolab default snippets have been copied to your current working directory."
+                f"nanolab default snippets have been copied into {snippets_path}."
             )
         else:
             raise FileExistsError("nanolab.snippets not found.")
@@ -52,41 +58,28 @@ def download_data(data: str, filename: str, resource_path: Path) -> Path:
     if not destination.exists():
         print(f"Start Fetching '{filename}' to '{destination}'")
         if data.startswith("http://") or data.startswith("https://"):
-            response = requests.get(data)
-            with destination.open("wb") as f:
-                f.write(response.content)
+            _download_remote_data(data, destination)
         else:
-            with destination.open("w") as f:
-                f.write(data)
+            _copy_local_data(data, destination)
         print(f"Done  Fetching '{filename}' to '{destination}'")
-        wait_for_file(destination, timeout=10)
     else:
         print(f"Skip  Fetching '{filename}' to '{destination}'")
 
     return destination
 
 
-def wait_for_file(file_path: str, timeout: int = 10):
-    """Wait for a file to be written completely."""
+def _download_remote_data(data: str, destination: Path) -> None:
+    response = requests.get(data)
+    if response.status_code == 200:
+        with destination.open("wb") as f:
+            f.write(response.content)
 
-    # Convert the timeout to seconds.
-    timeout = time.time() + timeout
+    else:
+        raise requests.HTTPError(
+            f"Failed to fetch '{destination.name}' from '{data}', status code: {response.status_code}"
+        )
 
-    # Wait for the file to exist.
-    while not path.exists(file_path):
-        time.sleep(0.1)
-        if time.time() > timeout:
-            raise TimeoutError(
-                f"Timeout waiting for file {file_path} to exist.")
 
-    # Wait for the file size to stop changing.
-    old_file_size = -1
-    while old_file_size != path.getsize(file_path):
-        old_file_size = path.getsize(file_path)
-        time.sleep(0.1)
-        if time.time() > timeout:
-            raise TimeoutError(
-                f"Timeout waiting for file {file_path} to be written completely."
-            )
-
-    # Now the file should be written completely.
+def _copy_local_data(data: str, destination: Path) -> None:
+    with destination.open("w") as f:
+        f.write(data)

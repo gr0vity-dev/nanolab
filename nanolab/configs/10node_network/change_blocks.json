@@ -1,18 +1,23 @@
-{
-    "_docker_tags": [ "db35_rev_a302_fde8", "nanocurrency/nano-beta:V25.0DB35", "nanocurrency/nano:V24.0"    ],
+{    
+    "testcase" : "11n10pr_50k_5k_change",
     "docker_tags": [
-        "nanocurrency/nano-beta:V25.0DB35"
+        "nanocurrency/nano:V25.0RC1"
     ],
+    "global": {
+        "BLOCK_PATH": "https://bnano.info/public/saved_blocks/10node_bucket_rounds.json",
+        "LEDGER_PATH": "https://bnano.info/public/saved_ledgers/10pr_bucket0-1-88-90-100_10kaccs.ldb",
+        "NL_CONFIG_PATH": "https://bnano.info/public/saved_configs/default_11n10pr.toml"
+    },
     "commands": [
         {
             "skip": false,
             "type": "snippet",
             "key": "setup_ledger_and_config",
             "variables": {
-                "NL_CONFIG": "nanolab/configs/10node_network/nl_config_default.toml",
-                "REMOTE_IP": "127.0.0.1",
+                "NL_CONFIG": "{NL_CONFIG_PATH}",
+                "REMOTE_IP": "172.17.0.1",
                 "SETUP_NODES": "nl_genesis nl_pr1 nl_pr2 nl_pr3 nl_pr4 nl_pr5 nl_pr6 nl_pr7 nl_pr8 nl_pr9 nl_pr10",
-                "LEDGER": "nanolab/data/ledgers/10pr_bucket0-1-88-90-100_10kaccs.ldb"
+                "LEDGER": "{LEDGER_PATH}"
             }
         },
         { 
@@ -25,7 +30,7 @@
                 "method": "publish_blocks",
                 "variables": {
                     "publish_params": {
-                        "blocks_path": "nanolab/data/blocks/10node_bucket_rounds.json",
+                        "blocks_path": "{BLOCK_PATH}",
                         "bps": 1000,
                         "start_round" : 0,
                         "end_round" : 1,
@@ -37,7 +42,7 @@
                     "logger_type": "rpc",
                     "logger_expected_count" : 50000,
                     "logger_timeout": 180,
-                    "_logger_include_peers": ["nl_pr1"]
+                    "logger_include_peers": ["nl_pr1"]
                 }
             },{
                 "skip": false,
@@ -45,7 +50,7 @@
                 "method": "publish_blocks",
                 "variables": {
                     "publish_params": {
-                        "blocks_path": "nanolab/data/blocks/10node_bucket_rounds.json",
+                        "blocks_path": "{BLOCK_PATH}",
                         "bps": 1000,
                         "start_round" : 0,
                         "end_round" : 1,
@@ -61,7 +66,7 @@
                 "method": "publish_blocks",
                 "variables": {
                     "publish_params": {
-                        "blocks_path": "nanolab/data/blocks/10node_bucket_rounds.json",
+                        "blocks_path": "{BLOCK_PATH}",
                         "bps": 1000,
                         "start_round" : 0,
                         "end_round" : 1,
@@ -77,7 +82,7 @@
                 "method": "publish_blocks",
                 "variables": {
                     "publish_params": {
-                        "blocks_path": "nanolab/data/blocks/10node_bucket_rounds.json",
+                        "blocks_path": "{BLOCK_PATH}",
                         "bps": 1000,
                         "start_round" : 0,
                         "end_round" : 1,
@@ -96,7 +101,7 @@
             "method": "publish_blocks",
             "variables": {
                 "publish_params": {
-                    "blocks_path": "nanolab/data/blocks/10node_bucket_rounds.json",
+                    "blocks_path": "{BLOCK_PATH}",
                     "bps": 1000,
                     "start_round" : 0,
                     "end_round" : 1,
@@ -107,7 +112,7 @@
                     
                 },
                 "logger_type": "rpc",
-                "logger_timeout": 30,
+                "logger_timeout": 300,
                 "logger_include_peers": ["nl_pr1"]
             }
         }

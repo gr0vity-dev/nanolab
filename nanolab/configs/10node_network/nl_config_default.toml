@@ -11,76 +11,68 @@ nanolooker_enable = false
 nanolooker_port = 42100
 nanolooker_node_name = "genesis"
 nanolooker_mongo_port = 27017
-#promexporter_enable = true
-#prom_gateway = "https://nl-exporter.bnano.info"
-#prom_runid = "nanoct"
+promexporter_enable = true
+prom_gateway = "https://nl-exporter.bnano.info"
+prom_runid = "nanolab"
 
 [representatives]
 node_prefix = "nl"
 host_port_peer = 44100
 host_port_rpc = 45100
 host_port_ws = 47100
-config_node_path = "./nano_nodes/services/default_config-node_voting-disabled.toml"
-config_rpc_path = "./nano_nodes/services/default_config-rpc.toml"
-docker_tag = ""
-#docker_tag = "pwo_elections-up-wip-exp-delay-221106"
+docker_tag = "nanocurrency/nano:V25.0RC1"
+
+[[representatives.nodes]]
+name = "genesis"
+vote_weight_percent = 0
+enable_voting = false
 
 [[representatives.nodes]]
 name = "pr1"
 seed = "1110000000000000000000000000000000000000000000000000000000000001"
 vote_weight_percent = 10
-config_node_path = "./nano_nodes/services/default_config-node.toml"
 
 [[representatives.nodes]]
 name = "pr2"
 seed = "1110000000000000000000000000000000000000000000000000000000000002"
 vote_weight_percent = 10
-config_node_path = "./nano_nodes/services/default_config-node.toml"
 
 [[representatives.nodes]]
 name = "pr3"
 seed = "1110000000000000000000000000000000000000000000000000000000000003"
 vote_weight_percent = 10
-config_node_path = "./nano_nodes/services/default_config-node.toml"
 
 [[representatives.nodes]]
 name = "pr4"
 seed = "1110000000000000000000000000000000000000000000000000000000000004"
 vote_weight_percent = 10
-config_node_path = "./nano_nodes/services/default_config-node.toml"
 
 [[representatives.nodes]]
 name = "pr5"
 seed = "1110000000000000000000000000000000000000000000000000000000000005"
 vote_weight_percent = 10
-config_node_path = "./nano_nodes/services/default_config-node.toml"
 
 [[representatives.nodes]]
 name = "pr6"
 seed = "1110000000000000000000000000000000000000000000000000000000000006"
 vote_weight_percent = 10
-config_node_path = "./nano_nodes/services/default_config-node.toml"
 
 [[representatives.nodes]]
 name = "pr7"
 seed = "1110000000000000000000000000000000000000000000000000000000000007"
 vote_weight_percent = 10
-config_node_path = "./nano_nodes/services/default_config-node.toml"
 
 [[representatives.nodes]]
 name = "pr8"
 seed = "1110000000000000000000000000000000000000000000000000000000000008"
 vote_weight_percent = 10
-config_node_path = "./nano_nodes/services/default_config-node.toml"
 
 [[representatives.nodes]]
 name = "pr9"
 seed = "1110000000000000000000000000000000000000000000000000000000000009"
 vote_weight_percent = 10
-config_node_path = "./nano_nodes/services/default_config-node.toml"
 
 [[representatives.nodes]]
 name = "pr10"
 seed = "1110000000000000000000000000000000000000000000000000000000000010"
 vote_weight_percent = 10
-config_node_path = "./nano_nodes/services/default_config-node.toml"

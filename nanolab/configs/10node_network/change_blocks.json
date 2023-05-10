@@ -1,5 +1,5 @@
 {    
-    "testcase" : "11n10pr_50k_5k_change",
+    "testcase" : "11n10pr_50k_4k_change",
     "docker_tags": [
         "nanocurrency/nano:V25.0RC1"
     ],
@@ -94,27 +94,6 @@
                 }
             }
           ]
-        },
-        {
-            "skip": true,
-            "type": "python",
-            "method": "publish_blocks",
-            "variables": {
-                "publish_params": {
-                    "blocks_path": "{BLOCK_PATH}",
-                    "bps": 1000,
-                    "start_round" : 0,
-                    "end_round" : 1,
-                    "subset" :{
-                        "start_index" : 0,
-                        "end_index" : 1000
-                    }
-                    
-                },
-                "logger_type": "rpc",
-                "logger_timeout": 300,
-                "logger_include_peers": ["nl_pr1"]
-            }
         }
     ]
 }

@@ -40,5 +40,38 @@
                 }
             }
         ]
+    },
+    "nested_circular_in_snippet_p1": {
+        "commands": [
+            {
+                "type": "snippet",
+                "key": "nested_circular_in_snippet_p2",
+                "variables": {
+                    "file_name": "test.txt"
+                }
+            }
+        ]
+    },
+    "nested_circular_in_snippet_p2": {
+        "commands": [
+            {
+                "type": "snippet",
+                "key": "nested_circular_in_snippet_p1",
+                "variables": {
+                    "file_name": "test.txt"
+                }
+            }
+        ]
+    },
+    "circular_in_snippet": {
+        "commands": [
+            {
+                "type": "snippet",
+                "key": "circular_in_snippet",
+                "variables": {
+                    "file_name": "test.txt"
+                }
+            }
+        ]
     }
 }

@@ -28,7 +28,6 @@ class Command:
             'python': PythonCommandMixin,
             'threaded': ThreadedCommandMixin
         }
-
         command_type = self.command_config['type']
 
         if command_type not in self.mixins:

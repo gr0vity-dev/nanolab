@@ -9,6 +9,7 @@ from nanolab.src.utils import extract_packaged_data_to_disk
 from nanolab.src.config_loader import TestcaseConfig
 from nanolab.src.snippet_manager import SnippetManager
 from nanolab.command.command import Command
+from nanolab.src.config_loader import ConfigLoader, ConfigValidator, ConfigCommandExecutor
 
 
 def parse_args():
@@ -110,13 +111,22 @@ class ArgParseHandler:
         #replace docker_tags with commandline
         if self.args.image: resolved_config["docker_tags"] = self.args.image
 
-        self.conf_rw.write_json(path_handler.resolved_config_file_path,
-                                resolved_config)
+        # self.conf_rw.write_json(path_handler.resolved_config_file_path,
+        #                         resolved_config)
+        # config_loader = _load_and_validate_configs(
+        #     path_handler.get_snippets_path(),
+        #     path_handler.get_resolved_config_path())
+        # _execute_commands(config_loader)
 
-        config_loader = _load_and_validate_configs(
-            path_handler.get_snippets_path(),
-            path_handler.get_resolved_config_path())
-        _execute_commands(config_loader)
+        resolved_path = path_handler.get_resolved_config_path()
+        snippet_path = path_handler.get_snippets_path()
+
+        snippet_manager = SnippetManager(snippet_path)
+        config_loader = ConfigLoader(snippet_manager)
+        final_config = config_loader.load_config(resolved_config)
+        self.conf_rw.write_json(resolved_path, final_config)
+        ConfigValidator.validate_config(final_config)
+        ConfigCommandExecutor.execute_commands(final_config)
 
     def list_testcases(self):
         files = self.github_api.get_files()

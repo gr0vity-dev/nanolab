@@ -94,7 +94,7 @@ class TestRun(unittest.TestCase):
         'unit_tests/test_configs/invalid_snippet_missing_mandatory_var.json'
     ])
     def test_invalid_snippet_missing_mandatory_var(self):
-        expected_message = "'Missing value(s) for mandatory variable(s): unused_mandatory_var'"
+        expected_message = "\"Mandatory variable 'unused_mandatory_var' is missing in 'test_snippet_unused_mandatory_var'. Variables defined: ['file_name']\""
         match_expected_error(KeyError, expected_message)
 
     @patch('sys.argv', [

@@ -1,5 +1,4 @@
 import threading
-from nanolab.src.snippet_manager import SnippetManager
 from nanolab import pycmd
 from .base_mixin import CommandMixinBase
 from collections import defaultdict
@@ -12,6 +11,7 @@ class ThreadedCommandMixin(CommandMixinBase):
             self.command_instance.execute_another_command(command_config)
 
     def validate(self):
+
         for python_command in self.command_instance.command_config["commands"]:
             if "method" not in python_command:
                 raise ValueError(f"Python command: 'method' is required.")

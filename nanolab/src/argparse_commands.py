@@ -6,10 +6,8 @@ import argparse
 from nanolab.src.config_handler import ConfigPathHandler, ConfigResourceHandler
 from nanomock.modules.nl_parse_config import ConfigReadWrite
 from nanolab.src.utils import extract_packaged_data_to_disk
-from nanolab.src.config_loader import TestcaseConfig
-from nanolab.src.snippet_manager import SnippetManager
-from nanolab.command.command import Command
 from nanolab.src.config_loader import ConfigLoader, ConfigValidator, ConfigCommandExecutor
+from nanolab.src.snippet_manager import SnippetManager
 
 
 def parse_args():
@@ -57,35 +55,6 @@ def parse_args():
     return parser.parse_args()
 
 
-def _load_and_validate_configs(snippet_path, config_path):
-
-    sinppet_manager = SnippetManager(snippet_path)
-    config_loader = TestcaseConfig(sinppet_manager, config_path=config_path)
-
-    config_loader.apply_globals()
-    config_loader.complete_config()
-    config_loader.validate_config()
-
-    return config_loader
-
-
-def _execute_command(command_config, snippet_manager: SnippetManager):
-    if command_config.get('skip', False):
-        return
-
-    command = Command(command_config, snippet_manager)
-    command.validate()
-    command.execute()
-
-
-def _execute_commands(config_loader: TestcaseConfig):
-
-    for docker_tag in config_loader.config["docker_tags"]:
-        environ["docker_tag"] = docker_tag
-        for command_config in config_loader.config["commands"]:
-            _execute_command(command_config, config_loader.snippet_manager)
-
-
 class ArgParseHandler:
 
     def __init__(self, args=None):
@@ -110,13 +79,6 @@ class ArgParseHandler:
             config_path, path_handler.downloads_path)
         #replace docker_tags with commandline
         if self.args.image: resolved_config["docker_tags"] = self.args.image
-
-        # self.conf_rw.write_json(path_handler.resolved_config_file_path,
-        #                         resolved_config)
-        # config_loader = _load_and_validate_configs(
-        #     path_handler.get_snippets_path(),
-        #     path_handler.get_resolved_config_path())
-        # _execute_commands(config_loader)
 
         resolved_path = path_handler.get_resolved_config_path()
         snippet_path = path_handler.get_snippets_path()

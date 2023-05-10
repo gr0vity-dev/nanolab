@@ -1,0 +1,10 @@
+{   
+    "testcase" : "snippet_circular_ref", 
+    "docker_tags" : ["nanocurrency/nano:V24.0"],
+    "commands": [
+        {
+            "type": "snippet",
+            "key": "circular_in_snippet"
+        }
+    ]
+}

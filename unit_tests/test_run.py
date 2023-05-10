@@ -185,6 +185,30 @@ class TestRun(unittest.TestCase):
         expected_output = "globals_resolve_path"
         contains_expected_substring(expected_output)
 
+    @patch('sys.argv', [
+        'nanolab', 'run', '--testcase',
+        'unit_tests/test_configs/snippet_circular_ref.json'
+    ])
+    def test_snippet_circular_reference(self):
+        expected_message = "Circular snippet reference detected: circular_in_snippet"
+        match_expected_error(ValueError, expected_message)
+
+    @patch('sys.argv', [
+        'nanolab', 'run', '--testcase',
+        'unit_tests/test_configs/snippet_nested_circular_ref.json'
+    ])
+    def test_snippet_nested_circular_reference(self):
+        expected_message = "Circular snippet reference detected: nested_circular_in_snippet_p1"
+        match_expected_error(ValueError, expected_message)
+
+    # @patch('sys.argv', [
+    #     'nanolab', 'run', '--testcase',
+    #     'unit_tests/test_configs/valid_threaded_snippet.json'
+    # ])
+    # def test_valid_threaded_snippet(self):
+    #     expected_message = "test_snippet outside threaded"
+    #     contains_expected_substring(expected_message)
+
 
 if __name__ == '__main__':
     unittest.main()

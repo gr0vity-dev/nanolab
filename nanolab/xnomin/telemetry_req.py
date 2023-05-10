@@ -1,6 +1,5 @@
 #!/bin/env python3
 
-import struct
 import binascii
 
 from nanolab.xnomin.peers import message_header, message_type, message_type_enum

@@ -1,5 +1,4 @@
 import shutil
-import requests
 from pathlib import Path
 from os import environ
 from nanomock.modules.nl_parse_config import ConfigReadWrite
@@ -39,9 +38,6 @@ class ConfigPathHandler:
 
     def get_testcase_name(self):
         return self.testcase_name
-
-    def get_config_path(self):
-        return self.resources_path / "config.json"
 
     def get_resources_path(self):
         return self.resources_path

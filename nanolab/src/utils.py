@@ -1,5 +1,4 @@
 from os import environ, path, walk
-import time
 import shutil
 from importlib import resources
 from pathlib import Path

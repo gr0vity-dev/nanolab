@@ -15,7 +15,7 @@ class ICommand(ABC):
         pass
 
 
-class Command:
+class Command(ICommand):
 
     def __init__(self, command_config: dict):
         self.command_config = command_config

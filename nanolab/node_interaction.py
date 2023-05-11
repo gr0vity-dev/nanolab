@@ -19,49 +19,48 @@ def load_nodes_config():
     return get_config_parser().get_nodes_config()
 
 
-async def create_logger(node, logger_type, hashes, logger_timeout,
-                        logger_expected_count):
+# async def create_logger(node, logger_type, hashes, logger_timeout,
+#                         logger_expected_count):
 
-    nanorpc = NanoRpc(node["rpc_url"])
-    node_version = nanorpc.version()
-    formatted_node_version = f'{node_version["node_vendor"]} {node_version["build_info"][0:7]}'
-    start_block_count = nanorpc.block_count()
+#     nanorpc = NanoRpc(node["rpc_url"])
+#     node_version = nanorpc.version()
+#     formatted_node_version = f'{node_version["node_vendor"]} {node_version["build_info"][0:7]}'
+#     start_block_count = nanorpc.block_count()
 
-    logger = StatsLogger(logger_type,
-                         node["name"],
-                         formatted_node_version,
-                         hashes,
-                         start_block_count,
-                         timeout=logger_timeout,
-                         expected_block_count=logger_expected_count,
-                         ws_url=node["ws_url"],
-                         rpc_url=node["rpc_url"])
-    return logger
+#     logger = StatsLogger(logger_type,
+#                          node["name"],
+#                          formatted_node_version,
+#                          hashes,
+#                          start_block_count,
+#                          timeout=logger_timeout,
+#                          expected_block_count=logger_expected_count,
+#                          ws_url=node["ws_url"],
+#                          rpc_url=node["rpc_url"])
+#     return logger
 
+# #Allow some time, to ensure StatsLoggers are correctly initialized before blocks are published by any thread
+# @ensure_duration(duration=2)
+# async def create_loggers(hashes,
+#                          logger_type=None,
+#                          logger_timeout=None,
+#                          included_peers=None,
+#                          excluded_peers=None,
+#                          logger_expected_count=None):
 
-#Allow some time, to ensure StatsLoggers are correctly initialized before blocks are published by any thread
-@ensure_duration(duration=2)
-async def create_loggers(hashes,
-                         logger_type=None,
-                         logger_timeout=None,
-                         included_peers=None,
-                         excluded_peers=None,
-                         logger_expected_count=None):
+#     if not logger_type: return []
+#     nodes_config = load_nodes_config()
+#     tasks = []
+#     for node in nodes_config:
+#         if included_peers and node["name"] not in included_peers:
+#             continue
+#         if excluded_peers and node["name"] in excluded_peers:
+#             continue
+#         tasks.append(
+#             create_logger(node, logger_type, hashes, logger_timeout,
+#                           logger_expected_count))
 
-    if not logger_type: return []
-    nodes_config = load_nodes_config()
-    tasks = []
-    for node in nodes_config:
-        if included_peers and node["name"] not in included_peers:
-            continue
-        if excluded_peers and node["name"] in excluded_peers:
-            continue
-        tasks.append(
-            create_logger(node, logger_type, hashes, logger_timeout,
-                          logger_expected_count))
-
-    loggers = await asyncio.gather(*tasks)
-    return loggers
+#     loggers = await asyncio.gather(*tasks)
+#     return loggers
 
 
 async def start_loggers(loggers):
@@ -80,11 +79,6 @@ async def xnolib_publish(params: dict,
     sp = SocketPublish(params)
     messages, hashes = sp.flatten_messages(block_lists)
 
-    # loggers = await create_loggers(hashes, logger_type, logger_timeout,
-    #                                included_peers, excluded_peers,
-    #                                logger_expected_count)
-
-    #enable_logging_task = asyncio.create_task(start_loggers(loggers))
     logger_handler = LoggerHandler(load_nodes_config())
     loggers_and_storages = await logger_handler.create_loggers(
         hashes, logger_type, logger_timeout, included_peers, excluded_peers,

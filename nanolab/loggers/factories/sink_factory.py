@@ -2,14 +2,14 @@
 from nanolab.loggers.sinks.console_sink import ConsoleSink
 
 
-class StorageFactory:
+class SinkFactory:
 
     @staticmethod
-    def create_storage(storage_type, *args, **kwargs):
+    def create_storage(storage_type):
         if storage_type == 'console':
-            return ConsoleSink(*args, **kwargs)
+            return ConsoleSink()
         elif storage_type == 'csv':
             pass
-            #return CSVStorage(*args, **kwargs)
+            #return CSVSink(*args, **kwargs)
         else:
             raise ValueError(f"Invalid storage_type: {storage_type}")

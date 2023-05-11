@@ -3,9 +3,8 @@
 from nanolab.decorators import ensure_duration
 from nanomock.modules.nl_rpc import NanoRpc
 from nanolab.loggers.factories.logger_factory import LoggerFactory
-from nanolab.loggers.factories.sink_factory import StorageFactory
-from nanolab.loggers.base_logger import AbstractLogger
-from nanolab.loggers.sinks.base_sink import AbstractStorage
+from nanolab.loggers.factories.sink_factory import SinkFactory
+from nanolab.loggers.contracts import ILogger, ISink
 import asyncio
 
 
@@ -17,21 +16,15 @@ class LoggerHandler:
     async def create_logger_and_storage(self, node, logger_type, hashes,
                                         logger_timeout, logger_expected_count,
                                         storage_type):
-        nanorpc = NanoRpc(node["rpc_url"])
-        node_version = nanorpc.version()
-        formatted_node_version = f'{node_version["node_vendor"]} {node_version["build_info"][0:7]}'
-        start_block_count = nanorpc.block_count()
+        config = {
+            "rpc_url": node["rpc_url"],
+            "node_name": node["name"],
+            "expected_blocks_count": logger_expected_count,
+            "timeout": logger_timeout
+        }
 
-        cemented_start = int(start_block_count["cemented"])
-        count_start = int(start_block_count["count"])
-
-        logger = LoggerFactory.create_logger(logger_type, node["rpc_url"],
-                                             len(hashes), logger_timeout,
-                                             cemented_start, count_start)
-        storage = StorageFactory.create_storage(storage_type, node["name"],
-                                                formatted_node_version,
-                                                count_start, cemented_start,
-                                                len(hashes) + count_start)
+        logger = LoggerFactory.create_logger(logger_type, config)
+        storage = SinkFactory.create_storage(storage_type)
 
         return logger, storage
 
@@ -67,7 +60,10 @@ class LoggerHandler:
         ]
         return logger_tasks
 
-    async def perform_logging_task(self, logger: AbstractLogger,
-                                   storage: AbstractStorage):
+    async def perform_logging_task(self,
+                                   logger: ILogger,
+                                   storage: ISink,
+                                   sleep_period: int = 1):
         async for logs in logger.fetch_logs():
             storage.store_logs(logs)
+            await asyncio.sleep(sleep_period)

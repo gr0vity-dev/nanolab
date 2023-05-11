@@ -32,12 +32,6 @@ class RPCLogger(ILogger):
     def is_fully_synced(self, cemented):
         cemented_diff = cemented - self.cemented_start
         is_synced = cemented_diff == self.expected_blocks_count
-        print(
-            cemented_diff,
-            cemented,
-            self.expected_blocks_count,
-            self.end_block_count,
-        )
         return is_synced
 
     async def fetch_logs(self) -> AsyncIterator[LogData]:
@@ -62,7 +56,7 @@ class RPCLogger(ILogger):
                 cemented_count=cemented,
                 cps=cps,
                 bps=bps,
-                timestamp=datetime.now(),
+                timestamp=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                 percent_cemented=percent_cemented,
                 percent_checked=percent_checked,
             )

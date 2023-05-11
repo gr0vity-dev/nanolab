@@ -1,0 +1,30 @@
+{
+    "testcase": "threaded_delay",
+    "docker_tags": [
+        "tag1"
+    ],
+    "commands": [
+        {
+            "type": "threaded",
+            "commands": [
+                {
+                    "type": "python",
+                    "class": "TestClass",
+                    "method": "long_running_method",                    
+                    "variables": {
+                        "duration": 0.1
+                    }
+                },
+                {
+                    "type": "python",
+                    "class": "TestClass",
+                    "method": "long_running_method",
+                    "delay" : 0.25,
+                    "variables": {
+                        "duration": 0.25
+                    }
+                }
+            ]
+        }
+    ]
+}

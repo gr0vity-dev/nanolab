@@ -24,7 +24,9 @@ class LogData:
     check_count: int
     cemented_count: int
     cps: int
+    #cps_avg: float
     bps: int
+    #bps_avg: float
     timestamp: str
     percent_cemented: float
     percent_checked: float

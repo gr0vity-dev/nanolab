@@ -19,75 +19,18 @@ def load_nodes_config():
     return get_config_parser().get_nodes_config()
 
 
-# async def create_logger(node, logger_type, hashes, logger_timeout,
-#                         logger_expected_count):
-
-#     nanorpc = NanoRpc(node["rpc_url"])
-#     node_version = nanorpc.version()
-#     formatted_node_version = f'{node_version["node_vendor"]} {node_version["build_info"][0:7]}'
-#     start_block_count = nanorpc.block_count()
-
-#     logger = StatsLogger(logger_type,
-#                          node["name"],
-#                          formatted_node_version,
-#                          hashes,
-#                          start_block_count,
-#                          timeout=logger_timeout,
-#                          expected_block_count=logger_expected_count,
-#                          ws_url=node["ws_url"],
-#                          rpc_url=node["rpc_url"])
-#     return logger
-
-# #Allow some time, to ensure StatsLoggers are correctly initialized before blocks are published by any thread
-# @ensure_duration(duration=2)
-# async def create_loggers(hashes,
-#                          logger_type=None,
-#                          logger_timeout=None,
-#                          included_peers=None,
-#                          excluded_peers=None,
-#                          logger_expected_count=None):
-
-#     if not logger_type: return []
-#     nodes_config = load_nodes_config()
-#     tasks = []
-#     for node in nodes_config:
-#         if included_peers and node["name"] not in included_peers:
-#             continue
-#         if excluded_peers and node["name"] in excluded_peers:
-#             continue
-#         tasks.append(
-#             create_logger(node, logger_type, hashes, logger_timeout,
-#                           logger_expected_count))
-
-#     loggers = await asyncio.gather(*tasks)
-#     return loggers
+async def start_loggers(logger_type, sink_type, logger_params: dict):
+    logger_handler = LoggerHandler(load_nodes_config(), logger_params)
+    await logger_handler.start_logging(logger_type, sink_type)
 
 
-async def start_loggers(loggers):
-    logger_tasks = [asyncio.create_task(logger.start()) for logger in loggers]
-    await asyncio.gather(*logger_tasks)
-
-
-async def xnolib_publish(params: dict,
-                         logger_type=None,
-                         logger_timeout=None,
-                         included_peers=None,
-                         excluded_peers=None,
-                         logger_expected_count=None):
+async def xnolib_publish(params: dict):
 
     block_lists = get_blocks_from_disk(params)
     sp = SocketPublish(params)
-    messages, hashes = sp.flatten_messages(block_lists)
-
-    logger_handler = LoggerHandler(load_nodes_config())
-    loggers_and_storages = await logger_handler.create_loggers(
-        hashes, logger_type, logger_timeout, included_peers, excluded_peers,
-        logger_expected_count, "console")
-    logger_tasks = logger_handler.get_logger_tasks(loggers_and_storages)
+    messages, _ = sp.flatten_messages(block_lists)
     sp_task = asyncio.create_task(sp.run(messages))
-
-    # Await both tasks concurrently
-    await asyncio.gather(*logger_tasks, sp_task)
+    await asyncio.gather(sp_task)
 
 
 def read_blocks_from_disk(path, seeds=False, hashes=False, blocks=False):

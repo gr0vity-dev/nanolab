@@ -107,7 +107,7 @@ class ConfigResourceHandler():
         source = Path(source_path)
 
         copy_files = force_copy or environ.get("NL_COPY_FILES", "False")
-        if str(copy_files).lower() == "true" and not destination.exists():
+        if str(copy_files).lower() == "true" or not destination.exists():
             shutil.copy(source, destination)
         return destination
 

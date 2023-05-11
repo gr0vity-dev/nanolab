@@ -1,7 +1,3 @@
-# handlers/logger_handler.py
-
-from nanolab.decorators import ensure_duration
-from nanomock.modules.nl_rpc import NanoRpc
 from nanolab.loggers.factories.logger_factory import LoggerFactory
 from nanolab.loggers.factories.sink_factory import SinkFactory
 from nanolab.loggers.contracts import ILogger, ISink
@@ -10,60 +6,47 @@ import asyncio
 
 class LoggerHandler:
 
-    def __init__(self, nodes_config):
+    def __init__(self, nodes_config, logger_params):
         self.nodes_config = nodes_config
+        self.included_peers = logger_params.pop("included_peers", None)
+        self.excluded_peers = logger_params.pop("excluded_peers", [])
+        self.interval = logger_params.pop("interval", 1)
+        self.csv_file = logger_params.pop("csv_file", None)
+        self.logger_params = logger_params
 
-    async def create_logger_and_storage(self, node, logger_type, hashes,
-                                        logger_timeout, logger_expected_count,
-                                        storage_type):
-        config = {
-            "rpc_url": node["rpc_url"],
-            "node_name": node["name"],
-            "expected_blocks_count": logger_expected_count,
-            "timeout": logger_timeout
-        }
-
-        logger = LoggerFactory.create_logger(logger_type, config)
-        storage = SinkFactory.create_storage(storage_type)
-
+    async def create_logger_and_storage(self, logger_type, sink_type,
+                                        logger_config):
+        logger = LoggerFactory.create_logger(logger_type, logger_config)
+        storage = SinkFactory.create_storage(sink_type, self.csv_file)
         return logger, storage
 
-    @ensure_duration(duration=2)
-    async def create_loggers(self,
-                             hashes,
-                             logger_type=None,
-                             logger_timeout=None,
-                             included_peers=None,
-                             excluded_peers=None,
-                             logger_expected_count=None,
-                             storage_type=None):
-        if not logger_type: return []
+    async def create_loggers(self, logger_type, sink_type, logger_params):
         tasks = []
         for node in self.nodes_config:
-            if included_peers and node["name"] not in included_peers:
+            if (self.included_peers and node["name"] not in self.included_peers
+                ) or node["name"] in self.excluded_peers:
                 continue
-            if excluded_peers and node["name"] in excluded_peers:
-                continue
+            current_params = dict(logger_params)
+            current_params["node_name"] = node["name"]
+            current_params["rpc_url"] = node["rpc_url"]
             tasks.append(
-                self.create_logger_and_storage(node, logger_type, hashes,
-                                               logger_timeout,
-                                               logger_expected_count,
-                                               storage_type))
+                self.create_logger_and_storage(logger_type, sink_type,
+                                               current_params))
 
-        loggers_and_storages = await asyncio.gather(*tasks)
-        return loggers_and_storages
+        return await asyncio.gather(*tasks)
 
-    def get_logger_tasks(self, loggers_and_storages):
-        logger_tasks = [
-            asyncio.create_task(self.perform_logging_task(logger, storage))
+    async def start_logging(self, logger_type, sink_type):
+
+        loggers_and_storages = await self.create_loggers(
+            logger_type, sink_type, self.logger_params)
+        tasks = [
+            self.perform_logging_task(logger, storage, self.interval)
             for logger, storage in loggers_and_storages
         ]
-        return logger_tasks
+        await asyncio.gather(*tasks)
 
-    async def perform_logging_task(self,
-                                   logger: ILogger,
-                                   storage: ISink,
-                                   sleep_period: int = 1):
+    async def perform_logging_task(self, logger: ILogger, storage: ISink,
+                                   interval: int):
         async for logs in logger.fetch_logs():
             storage.store_logs(logs)
-            await asyncio.sleep(sleep_period)
+            await asyncio.sleep(interval)

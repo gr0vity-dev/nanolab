@@ -1,41 +1,54 @@
 {
-    "testcase" : "threaded_with_group",
-    "docker_tags" : ["tag1"],
+    "testcase": "threaded_with_group",
+    "docker_tags": [
+        "tag1"
+    ],
     "commands": [
         {
             "type": "threaded",
             "commands": [
                 {
                     "type": "python",
+                    "class": "TestClass",
+                    "method": "long_running_method",
+                    "variables": {
+                        "duration": 0.5
+                    }
+                },
+                {
+                    "type": "python",
+                    "class": "TestClass",
+                    "method": "long_running_method",
+                    "variables": {
+                        "duration": 0.5
+                    }
+                },                
+                {
+                    "group" : "g1",
+                    "type": "python",
                     "class": "TestClass",                    
                     "method": "long_running_method",
-                    "variables" : {"duration" : 1} 
+                    "variables": {
+                        "duration": 0.5
+                    }
                 },
                 {
-                    "type": "python",
-                    "class": "TestClass",                    
-                    "method": "long_running_method",
-                    "variables" : {"duration" : 1} 
-                },
-                {
+                    "group" : "g1",
                     "type": "python",
                     "class": "TestClass",
-                    "group": "g1",
                     "method": "long_running_method",
-                    "variables" : {"duration" : 1} 
-                },
-                {
-                    "type": "python",
-                    "class": "TestClass",
-                    "group": "g1",
-                    "method": "long_running_method",
-                    "variables" : {"duration" : 1} 
-                },
+                    "variables": {
+                        "duration": 0.5
+                    }
+                }
+                ,
                 {
                     "type": "python",
                     "class": "TestClass",
                     "method": "long_running_method",
-                    "variables" : {"duration" : 1} 
+                    "variables": {
+                        "duration": 0.2
+                    }
                 }
             ]
         }

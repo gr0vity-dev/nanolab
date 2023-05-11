@@ -11,6 +11,8 @@ import random
 import time
 import itertools
 
+from nanolab.loggers.logger_handler import LoggerHandler
+
 
 def load_nodes_config():
     """Load nodes configuration from a file."""
@@ -78,15 +80,20 @@ async def xnolib_publish(params: dict,
     sp = SocketPublish(params)
     messages, hashes = sp.flatten_messages(block_lists)
 
-    loggers = await create_loggers(hashes, logger_type, logger_timeout,
-                                   included_peers, excluded_peers,
-                                   logger_expected_count)
+    # loggers = await create_loggers(hashes, logger_type, logger_timeout,
+    #                                included_peers, excluded_peers,
+    #                                logger_expected_count)
 
-    enable_logging_task = asyncio.create_task(start_loggers(loggers))
+    #enable_logging_task = asyncio.create_task(start_loggers(loggers))
+    logger_handler = LoggerHandler(load_nodes_config())
+    loggers_and_storages = await logger_handler.create_loggers(
+        hashes, logger_type, logger_timeout, included_peers, excluded_peers,
+        logger_expected_count, "console")
+    logger_tasks = logger_handler.get_logger_tasks(loggers_and_storages)
     sp_task = asyncio.create_task(sp.run(messages))
 
     # Await both tasks concurrently
-    await asyncio.gather(enable_logging_task, sp_task)
+    await asyncio.gather(*logger_tasks, sp_task)
 
 
 def read_blocks_from_disk(path, seeds=False, hashes=False, blocks=False):

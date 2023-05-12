@@ -42,6 +42,11 @@ def extract_packaged_data_to_disk(snippets_path):
             raise FileExistsError("nanolab.snippets not found.")
 
 
+def set_nanomock_config_path(config_path: Path):
+    environ["NL_CONF_DIR"] = config_path.parent
+    environ["NL_CONF_FILE"] = config_path.name
+
+
 def get_config_parser() -> ConfigParser:
     default_path = "."
     default_file = "nl_config.toml"

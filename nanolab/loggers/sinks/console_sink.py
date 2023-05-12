@@ -18,11 +18,13 @@ class ConsoleSink(ISink):
         cps = logs.cps
         percent_cemented = logs.percent_cemented
         percent_checked = logs.percent_checked
+        bps_avg = logs.bps_avg or 0
+        cps_avg = logs.cps_avg or 0
 
         print(
             f"{timestamp:<20} {elapsed_time:>4} sec | {node_name[:16]:<16} | {node_version:<10} | \
-C: {cemented_count:>7}/{check_count:>7} @ {cps:>4} cps ({percent_cemented:>6.2f}%) | \
-B: {bps:>4} bps ({percent_checked:>6.2f}%)")
+{cemented_count:>7}/{check_count:>7} @ CPS: {cps:>7} (avg {cps_avg:>7.2f}) ({percent_cemented:>6.2f}%) | \
+BPS: {bps:>7} (avg {bps_avg:>7.2f}) ({percent_checked:>6.2f}%)")
 
     def end(self):
         pass

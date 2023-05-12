@@ -11,19 +11,29 @@ class RPCLogger(ILogger):
 
     FETCH_INTERVAL_DELAY = 0.1  # seconds
 
-    def __init__(self, node_name: str, rpc_url: str,
-                 expected_blocks_count: int, timeout: int):
+    def __init__(self,
+                 node_name: str,
+                 rpc_url: str,
+                 expected_blocks_count: int,
+                 timeout: int,
+                 count_start=None,
+                 cemented_start=None):
         self.node_name = node_name
         self.rpc_url = rpc_url
         self.expected_blocks_count = expected_blocks_count
         self.timeout = timeout
         self.nanorpc = NanoRpc(self.rpc_url)
-        self.count_start, self.cemented_start = self._get_block_count()
+        if count_start is None or cemented_start is None:
+            self.count_start, self.cemented_start = self._get_block_count()
+        else:
+            self.count_start = count_start
+            self.cemented_start = cemented_start
         node_version = self.nanorpc.version()
-        self.node_version = f'{node_version["node_vendor"]} {node_version["build_info"][0:7]}'
+        self.node_version = f'{node_version["node_vendor"]} {node_version["build_info"][0:7]}' if node_version else "???"
         self.end_block_count = self.count_start + self.expected_blocks_count
         self.previous_count = 0
         self.previous_cemented = 0
+        self.previous_elapsed_time = 0
 
     def _get_block_count(self):
         block_count = self.nanorpc.block_count()
@@ -37,16 +47,32 @@ class RPCLogger(ILogger):
     async def fetch_logs(self) -> AsyncIterator[LogData]:
         """Yield logs at intervals."""
         start_time = time.time()
-
+        timeout_start = time.time()
         while True:
             count, cemented = self._get_block_count()
             is_synced = self.is_fully_synced(cemented)
-            elapsed_time = int(time.time() - start_time)
-            percent_cemented = (cemented / self.end_block_count) * 100
-            percent_checked = (count / self.end_block_count) * 100
+            percent_cemented = ((cemented - self.cemented_start) /
+                                self.expected_blocks_count) * 100
+            percent_checked = (
+                (count - self.count_start) / self.expected_blocks_count) * 100
 
-            cps = cemented - self.previous_cemented if self.previous_cemented is not None else 0
-            bps = count - self.previous_count if self.previous_count is not None else 0
+            #Loggers are cerated before the publishing starts.
+            #Elapsed is started when the first blcok is received by the node
+            if percent_checked == 0: start_time = time.time()
+            elapsed_time = int(time.time() - start_time)
+
+            cps = (cemented - self.previous_cemented) / max(
+                1, (elapsed_time -
+                    self.previous_elapsed_time)) if percent_checked > 0 else 0
+            bps = (count - self.previous_count) / max(
+                1, (elapsed_time -
+                    self.previous_elapsed_time)) if percent_checked > 0 else 0
+
+            bps_avg = (
+                count - self.count_start
+            ) / elapsed_time if elapsed_time > 0 and percent_checked < 100 else None
+            cps_avg = (cemented - self.cemented_start
+                       ) / elapsed_time if elapsed_time > 0 else None
 
             yield LogData(
                 node_name=self.node_name,
@@ -59,12 +85,14 @@ class RPCLogger(ILogger):
                 timestamp=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                 percent_cemented=percent_cemented,
                 percent_checked=percent_checked,
-            )
-            if is_synced or elapsed_time > self.timeout:
+                bps_avg=bps_avg,
+                cps_avg=cps_avg)
+            if is_synced or time.time() - timeout_start > self.timeout:
                 break
 
             self.previous_count = count
             self.previous_cemented = cemented
+            self.previous_elapsed_time = elapsed_time
             await asyncio.sleep(self.FETCH_INTERVAL_DELAY)
 
 

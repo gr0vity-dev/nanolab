@@ -1,9 +1,6 @@
 from nanolab.xnomin.peers import get_connected_socket_endpoint, message_header, block_state, block_type_enum, message_type_enum, network_id, message_type, get_peers_from_service
 from nanolab.xnomin.handshake import node_handshake_id
 from nanomock.modules.nl_parse_config import ConfigReadWrite
-from nanomock.modules.nl_rpc import NanoRpc
-from nanolab.node_tools import StatsLogger
-from nanolab.decorators import ensure_duration
 from nanolab.src.utils import get_config_parser
 from typing import Any, Dict, List
 import asyncio
@@ -11,17 +8,12 @@ import random
 import time
 import itertools
 
-from nanolab.loggers.logger_handler import LoggerHandler
+from nanolab.loggers.logger_manager import LoggingManager
 
 
-def load_nodes_config():
-    """Load nodes configuration from a file."""
-    return get_config_parser().get_nodes_config()
-
-
-async def start_loggers(logger_type, sink_type, logger_params: dict):
-    logger_handler = LoggerHandler(load_nodes_config(), logger_params)
-    await logger_handler.start_logging(logger_type, sink_type)
+async def start_loggers(logger_params: dict, sink_params: dict):
+    logger_manager = LoggingManager(logger_params, sink_params)
+    await logger_manager.start_logging()
 
 
 async def xnolib_publish(params: dict):

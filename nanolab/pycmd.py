@@ -15,8 +15,8 @@ class NodeInteraction:
         # Your existing code...
         self.logger = None
 
-    def start_logger(self, logger_type, sink_type, logger_params):
-        asyncio.run(nni.start_loggers(logger_type, sink_type, logger_params))
+    def start_logger(self, logger_params, sink_params):
+        asyncio.run(nni.start_loggers(logger_params, sink_params))
 
     def publish_blocks(self, publish_params):
         '''

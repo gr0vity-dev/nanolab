@@ -12,7 +12,7 @@ setup(name="nanolab",
       url="https://github.com/gr0vity-dev/nanolab",
       packages=find_packages(exclude=["unit_tests"]),
       include_package_data=True,
-      install_requires=["nanomock>=0.0.10"],
+      install_requires=["nanomock>=0.0.10", "sqlalchemy"],
       entry_points={
           'console_scripts': [
               'nanolab=nanolab.main:main',

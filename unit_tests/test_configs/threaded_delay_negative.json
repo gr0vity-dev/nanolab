@@ -1,6 +1,8 @@
 {
-    "testcase" : "threaded_parallel",
-    "docker_tags" : ["tag1"],
+    "testcase": "threaded_delay_negative",
+    "docker_tags": [
+        "tag1"
+    ],
     "commands": [
         {
             "type": "threaded",
@@ -9,19 +11,18 @@
                     "type": "python",
                     "class": "TestClass",
                     "method": "long_running_method",
-                    "variables" : {"duration" : 0.5} 
+                    "delay" : -0.25,
+                    "variables": {
+                        "duration": 0.1
+                    }
                 },
                 {
                     "type": "python",
                     "class": "TestClass",
                     "method": "long_running_method",
-                    "variables" : {"duration" : 0.5} 
-                },
-                {
-                    "type": "python",
-                    "class": "TestClass",
-                    "method": "long_running_method",
-                    "variables" : {"duration" : 0.5} 
+                    "variables": {
+                        "duration": 0.25
+                    }
                 }
             ]
         }

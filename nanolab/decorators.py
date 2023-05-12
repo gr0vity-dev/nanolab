@@ -25,3 +25,13 @@ def ensure_duration(duration=2):
         return wrapper
 
     return decorator
+
+
+def print_dot(func):
+
+    def wrapper(*args, **kwargs):
+        result = func(*args, **kwargs)
+        print('.', end='', flush=True)
+        return result
+
+    return wrapper

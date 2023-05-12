@@ -15,20 +15,14 @@ class NodeInteraction:
         # Your existing code...
         self.logger = None
 
-    def publish_blocks(self,
-                       publish_params,
-                       logger_type=None,
-                       logger_timeout=600,
-                       logger_include_peers=None,
-                       logger_exclude_peers=None,
-                       logger_expected_count=None):
+    def start_logger(self, logger_type, sink_type, logger_params):
+        asyncio.run(nni.start_loggers(logger_type, sink_type, logger_params))
+
+    def publish_blocks(self, publish_params):
         '''
         mandatory publish_params: blocks_path, bps
-        optional  publish_params: peers, split, split_skip, reverse, shuffle, 
+         optional publish_params: peers, split, split_skip, reverse, shuffle, 
                   start_round, end_round, subset.start_index, subset.end_index
          '''
 
-        asyncio.run(
-            nni.xnolib_publish(publish_params, logger_type, logger_timeout,
-                               logger_include_peers, logger_exclude_peers,
-                               logger_expected_count))
+        asyncio.run(nni.xnolib_publish(publish_params))

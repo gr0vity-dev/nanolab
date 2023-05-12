@@ -105,8 +105,8 @@ class TestRun(unittest.TestCase):
         start_time = time.time()
         run.main()
         duration = time.time() - start_time
-        self.assertTrue(duration > 1, f"too short: {duration:.2f} s")
-        self.assertTrue(duration < 1.35, f"too long: {duration:.2f} s")
+        self.assertTrue(duration > 0.48, f"too short: {duration:.2f} s")
+        self.assertTrue(duration < 0.52, f"too long: {duration:.2f} s")
 
     @patch('sys.argv', [
         'nanolab', 'run', '--testcase',
@@ -116,8 +116,30 @@ class TestRun(unittest.TestCase):
         start_time = time.time()
         run.main()
         duration = time.time() - start_time
-        self.assertTrue(duration > 2, f"too short: {duration:.2f} s")
-        self.assertTrue(duration < 2.35, f"too long: {duration:.2f} s")
+        self.assertTrue(duration > 0.98, f"too short: {duration:.2f} s")
+        self.assertTrue(duration < 1.02, f"too long: {duration:.2f} s")
+
+    @patch('sys.argv', [
+        'nanolab', 'run', '--testcase',
+        'unit_tests/test_configs/threaded_delay_negative.json'
+    ])
+    def test_threaded_delay_negative(self):
+        start_time = time.time()
+        run.main()
+        duration = time.time() - start_time
+        self.assertTrue(duration > 0.48, f"too short: {duration:.2f} s")
+        self.assertTrue(duration < 0.52, f"too long: {duration:.2f} s")
+
+    @patch('sys.argv', [
+        'nanolab', 'run', '--testcase',
+        'unit_tests/test_configs/threaded_delay.json'
+    ])
+    def test_threaded_delay_negative(self):
+        start_time = time.time()
+        run.main()
+        duration = time.time() - start_time
+        self.assertTrue(duration > 0.48, f"too short: {duration:.2f} s")
+        self.assertTrue(duration < 0.52, f"too long: {duration:.2f} s")
 
     @patch('sys.argv', [
         'nanolab', 'run', '--testcase',

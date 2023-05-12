@@ -8,6 +8,16 @@ class TestClass:
     def long_running_method(self, duration=1):
         time.sleep(duration)
 
+    def test_list(self, test_list):
+        if isinstance(test_list, list):
+            print(test_list, len(test_list))
+
+    def print_to_console(self, value):
+        print(value)
+
+    def return_value(self, value):
+        return value
+
 
 class NodeInteraction:
 

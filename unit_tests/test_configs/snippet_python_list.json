@@ -1,0 +1,13 @@
+{
+    "testcase" : "snippet_python_list",
+    "docker_tags" : ["nanocurrency/nano:V24.0"],
+    "commands": [
+        {
+            "type": "snippet",
+            "key": "python_snippet_list",
+            "variables": {
+                "list": ["pr1", "pr2"]
+            }
+        }
+    ]
+}

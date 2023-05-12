@@ -78,13 +78,56 @@ class ConfigLoader:
                     f"Mandatory variable '{var}' is missing in '{key}'. Variables defined: {list(variables.keys())}"
                 )
 
+    # def _replace_vars_in_commands(self, commands, variables):
+    #     for command in commands:
+    #         self._replace_vars_in_dict(command, variables)
+    #     return commands
+
+    # def _replace_vars_in_dict(self, item, variables):
+    #     if isinstance(item, dict):
+    #         for key, value in item.items():
+    #             if isinstance(value, str):
+    #                 item[key] = self._replace_vars_in_string(value, variables)
+    #             else:
+    #                 self._replace_vars_in_dict(value, variables)
+    #     elif isinstance(item, list):
+    #         for value in item:
+    #             self._replace_vars_in_dict(value, variables)
+
+    # def _replace_vars_in_string(self, value, variables):
+    #     for var, var_value in variables.items():
+    #         value = value.replace(f'{{{var}}}', var_value)
+    #     return value
     def _replace_vars_in_commands(self, commands, variables):
         for command in commands:
-            if "command" in command:
-                for var, value in variables.items():
-                    command["command"] = command["command"].replace(
-                        f'{{{var}}}', value)
+            self._replace_vars_in_dict(command, variables)
         return commands
+
+    def _replace_vars_in_dict(self, item, variables):
+        if isinstance(item, dict):
+            for key, value in item.items():
+                if isinstance(value, (dict, list)):
+                    self._replace_vars_in_dict(value, variables)
+                else:
+                    item[key] = self._replace_vars_in_item(value, variables)
+        elif isinstance(item, list):
+            for i in range(len(item)):
+                if isinstance(item[i], (dict, list)):
+                    self._replace_vars_in_dict(item[i], variables)
+                else:
+                    item[i] = self._replace_vars_in_item(item[i], variables)
+
+    def _replace_vars_in_item(self, item, variables):
+        if isinstance(item, str):
+            for var, var_value in variables.items():
+                placeholder = f'{{{var}}}'
+                if item == placeholder:  # if the item is exactly equal to the placeholder
+                    return var_value  # return the original variable value
+                if placeholder in item:  # if the placeholder is part of the string
+                    item = item.replace(
+                        placeholder, str(var_value)
+                    )  # replace it with string representation of variable
+        return item
 
     def _apply_variables_to_command(self, global_variables: dict,
                                     command: dict):

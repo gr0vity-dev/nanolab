@@ -134,12 +134,28 @@ class TestRun(unittest.TestCase):
         'nanolab', 'run', '--testcase',
         'unit_tests/test_configs/threaded_delay.json'
     ])
-    def test_threaded_delay_negative(self):
+    def test_threaded_delay(self):
         start_time = time.time()
         run.main()
         duration = time.time() - start_time
         self.assertTrue(duration > 0.48, f"too short: {duration:.2f} s")
         self.assertTrue(duration < 0.52, f"too long: {duration:.2f} s")
+
+    @patch('sys.argv', [
+        'nanolab', 'run', '--testcase',
+        'unit_tests/test_configs/snippet_python_valid.json'
+    ])
+    def test_python_snippet(self):
+        expected_output = "Hello there from python snippet"
+        match_expected_output(expected_output)
+
+    @patch('sys.argv', [
+        'nanolab', 'run', '--testcase',
+        'unit_tests/test_configs/snippet_python_list.json'
+    ])
+    def test_python_snippet_list(self):
+        expected_output = "['pr1', 'pr2'] 2"
+        match_expected_output(expected_output)
 
     @patch('sys.argv', [
         'nanolab', 'run', '--testcase',

@@ -65,5 +65,37 @@
                 "command": "nanomock create && nanomock reset && nanomock start && nanomock init && nanomock restart_wait_sync"
             }
         ]
+    },
+
+    "sql_logger" : {
+        "mandatory_vars": [
+            "CONNECTION_STRING",
+            "TESTCASE_NAME",
+            "TIMEOUT_S",
+            "EXPECTED_BLOCK_COUNT",
+            "NODES"
+        ],
+        "commands" : [
+            {
+                "type": "python",
+                "class": "NodeInteraction",
+                "method": "start_logger",
+                "delay": -0.1,
+                "variables": {
+                    "logger_params": {  
+                        "type" : "rpc",                         
+                        "timeout": "{TIMEOUT_S}",
+                        "expected_blocks_count": "{EXPECTED_BLOCK_COUNT}",
+                        "included_peers": "{NODES}"
+                    }, 
+                    "sink_params" : {
+                        "type": "sql",
+                        "db_uri": "{CONNECTION_STRING}",  
+                        "milestones": [10, 25, 50, 75, 90, 99, 100],  
+                        "testcase_name": "{TESTCASE_NAME}"
+                    }
+                }
+            },
+        ]
     }
 }

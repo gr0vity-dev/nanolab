@@ -87,3 +87,13 @@ def _download_remote_data(data: str, destination: Path) -> None:
 def _copy_local_data(data: str, destination: Path) -> None:
     with destination.open("w") as f:
         f.write(data)
+
+
+def print_dot(func):
+
+    def wrapper(*args, **kwargs):
+        result = func(*args, **kwargs)
+        print('.', end='', flush=True)
+        return result
+
+    return wrapper

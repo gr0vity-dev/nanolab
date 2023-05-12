@@ -10,6 +10,36 @@
             }
         ]
     },
+    "python_snippet": {
+        "mandatory_vars": [
+            "message"            
+        ],
+        "commands": [
+            {
+                "type": "python",
+                "class": "TestClass",
+                "method": "print_to_console",
+                "variables": {
+                    "value": "{message} from python snippet"
+                }
+            }      
+        ]
+    },
+    "python_snippet_list": {
+        "mandatory_vars": [
+            "list"            
+        ],
+        "commands": [
+            {
+                "type": "python",
+                "class": "TestClass",
+                "method": "test_list",
+                "variables": {
+                    "test_list": "{list}"
+                }
+            }      
+        ]
+    },
     "test_snippet_unused_mandatory_var": {
         "mandatory_vars": [
             "file_name",

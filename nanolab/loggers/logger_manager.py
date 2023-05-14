@@ -46,3 +46,4 @@ class LoggingManager:
         async for logs in logger.fetch_logs():
             storage.store_logs(logs)
             await asyncio.sleep(interval)
+        storage.end()

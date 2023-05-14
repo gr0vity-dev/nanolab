@@ -239,6 +239,14 @@ class TestRun(unittest.TestCase):
         expected_message = "Circular snippet reference detected: nested_circular_in_snippet_p1"
         match_expected_error(ValueError, expected_message)
 
+    @patch('sys.argv', [
+        'nanolab', 'run', '--testcase',
+        'unit_tests/test_configs/snippet_multiple_same.json'
+    ])
+    def test_snippet_multiple_same(self):
+        expected_message = "file command_1\nfile command_2"
+        match_expected_output(expected_message)
+
     # @patch('sys.argv', [
     #     'nanolab', 'run', '--testcase',
     #     'unit_tests/test_configs/valid_threaded_snippet.json'

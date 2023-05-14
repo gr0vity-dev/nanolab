@@ -1,0 +1,20 @@
+{
+    "testcase" : "snippet_multiple_same",
+    "docker_tags" : ["nanocurrency/nano:V24.0"],
+    "commands": [
+        {
+            "type": "snippet",
+            "key": "test_snippet",
+            "variables": {
+                "file_name": "command_1"                
+            }
+        },
+        {
+            "type": "snippet",
+            "key": "test_snippet",
+            "variables": {
+                "file_name": "command_2"
+            }
+        }
+    ]
+}

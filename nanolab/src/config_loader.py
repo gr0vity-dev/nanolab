@@ -2,6 +2,7 @@ import os
 from nanomock.modules.nl_parse_config import ConfigReadWrite
 from .snippet_manager import SnippetManager
 from nanolab.command.command import Command
+from copy import deepcopy
 
 
 class ConfigLoader:
@@ -63,7 +64,7 @@ class ConfigLoader:
         if key in breadcrumb:
             raise ValueError(f"Circular snippet reference detected: {key}")
 
-        snippet = self.snippet_manager.get_snippet_by_key(key)
+        snippet = deepcopy(self.snippet_manager.get_snippet_by_key(key))
         variables = command.get("variables", {})
         self._check_mandatory_vars(snippet, variables, key)
         resolved_snippet = self._resolve_snippets(snippet, breadcrumb + [key])

@@ -1,3 +1,5 @@
+from nanolab.src.nano_rpc import NanoRpcV2
+from nanolab.src.utils import get_config_parser
 from time import strftime, gmtime, time
 from math import ceil
 
@@ -9,13 +11,18 @@ class ConfirmationStatsManager:
         self.printer = ConfirmationStatsPrinter()
         self.formatter = ConfirmationTableFormatter()
 
-    def set_start_block_count(self, start_block_count: dict) -> None:
+    async def initialize(self, node_name):
+        self.rpc_v2 = NanoRpcV2(get_config_parser().get_node_rpc(node_name))
+        self.rpc_v2.create_session()
+        start_block_count = await self.rpc_v2.block_count()
         self.calculator.set_start_block_count(start_block_count)
 
     def set_end_block_count(self, end_block_count: dict) -> None:
         self.calculator.set_end_block_count(end_block_count)
 
-    def print_stats(self) -> None:
+    async def print_stats(self) -> None:
+        end_block_count = await self.rpc_v2.block_count()
+        self.calculator.set_end_block_count(end_block_count)
         stats = self.calculator.compute_stats()
         self.printer.print_stats(stats, self.formatter)
 

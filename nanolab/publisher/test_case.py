@@ -46,7 +46,6 @@ class BlockGenerationTestCase(ITestCase):
         self.node_name = config.get("node_name", conf_p.get_nodes_name()[:-1])
         self.ba_l = BlockAsserts(self.node_name)
         self.bg_l = BlockGenerator(self.node_name)
-        self.rpc_v2 = NanoRpcV2(conf_p.get_node_rpc(self.node_name))
         self.stats_manager = ConfirmationStatsManager(self.timeout_s)
         self.event_bus.subscribe('block_confirmed',
                                  self.stats_manager.on_block_confirmed)
@@ -74,18 +73,12 @@ class BlockGenerationTestCase(ITestCase):
         return
 
     async def run(self):
-        self.rpc_v2.create_session()
-        start_block_count = await self.rpc_v2.block_count()
-        self.stats_manager.set_start_block_count(start_block_count)
-
+        await self.stats_manager.initialize(self.node_name)
         for counter in range(self.start_index,
                              self.start_index + self.block_count):
             seed_index = counter if self.is_independent else self.start_index
             await self._generate_and_confirm_block(seed_index)
 
-        end_block_count = await self.rpc_v2.block_count()
-        await self.rpc_v2.close_session()
-        self.stats_manager.set_end_block_count(end_block_count)
-        self.stats_manager.print_stats()  # no longer pass conf_lst
+        await self.stats_manager.print_stats()  # no longer pass conf_lst
 
         return self.block_count

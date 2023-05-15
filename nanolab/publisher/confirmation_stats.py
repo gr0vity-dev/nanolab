@@ -15,9 +15,13 @@ class ConfirmationStatsManager:
     def set_end_block_count(self, end_block_count: dict) -> None:
         self.calculator.set_end_block_count(end_block_count)
 
-    def print_stats(self, conf_lst: list) -> None:
-        stats = self.calculator.compute_stats(conf_lst)
+    def print_stats(self) -> None:
+        stats = self.calculator.compute_stats()
         self.printer.print_stats(stats, self.formatter)
+
+    async def on_block_confirmed(self, event):
+        # Do something with the event, for example, append it to a list
+        self.calculator.add_event(event)
 
 
 class ConfirmationCalculator:
@@ -25,6 +29,7 @@ class ConfirmationCalculator:
     def __init__(self, block_timeout_s):
         self.block_timeout_s = block_timeout_s
         self.start_time = time()
+        self.events = []  # Add this list to keep track of events
 
     def _percentile(self, data, percentile):
         n = len(data)
@@ -34,21 +39,28 @@ class ConfirmationCalculator:
         else:
             return sorted(data)[int(ceil(p)) - 1]
 
+    def add_event(self, event):
+        # You might want to change the structure of the data in the list
+        self.events.append({
+            "conf_duration": event.conf_duration,
+            "timeout": event.timeout
+        })
+
     def set_start_block_count(self, start_block_count):
         self.start_block_count = start_block_count
 
     def set_end_block_count(self, end_block_count):
         self.end_block_count = end_block_count
 
-    def compute_stats(self, conf_lst):
+    def compute_stats(self):
         self.new_blocks = int(self.end_block_count.get("count", 0)) - int(
             self.start_block_count.get("count", 0))
         self.new_cemented = int(self.end_block_count.get("cemented", 0)) - int(
             self.start_block_count.get("cemented", 0))
         self.confirmations = [
-            x["conf_duration"] for x in conf_lst if x["timeout"] == False
+            e["conf_duration"] for e in self.events if e["timeout"] == False
         ]
-        self.timeouts = [x for x in conf_lst if x["timeout"]]
+        self.timeouts = [e for e in self.events if e["timeout"]]
         self.conf_duration = time() - self.start_time
 
         gather_int = {

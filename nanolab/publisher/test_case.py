@@ -5,6 +5,8 @@ from nanolab.publisher.block_generator import BlockGenerator
 from nanolab.publisher.confirmation_stats import ConfirmationStatsManager
 from nanolab.src.utils import get_config_parser, print_dot
 import time
+from nanolab.publisher.event_bus import EventBus
+from nanolab.publisher.block_event import BlockEvent
 
 
 class ITestCase(ABC):
@@ -33,6 +35,7 @@ class TestCaseFactory:
 class BlockGenerationTestCase(ITestCase):
 
     def __init__(self, config: dict):
+        self.event_bus = EventBus()
         conf_p = get_config_parser()
 
         self.source_seed = config["source_seed"]
@@ -45,6 +48,8 @@ class BlockGenerationTestCase(ITestCase):
         self.bg_l = BlockGenerator(self.node_name)
         self.rpc_v2 = NanoRpcV2(conf_p.get_node_rpc(self.node_name))
         self.stats_manager = ConfirmationStatsManager(self.timeout_s)
+        self.event_bus.subscribe('block_confirmed',
+                                 self.stats_manager.on_block_confirmed)
 
     @print_dot
     async def _generate_and_confirm_block(self, index):
@@ -58,29 +63,29 @@ class BlockGenerationTestCase(ITestCase):
                 rep=representative)
             await self.ba_l.assert_single_block_confirmed_wait(
                 res["hash"], self.timeout_s, 0.05)
-            return {
-                "conf_duration": time.time() - start_time,
-                "timeout": False
-            }
+            event = BlockEvent(time.time() - start_time, False)
+            await self.event_bus.publish('block_confirmed', event)
         except AssertionError as ex:
             print("DEBUG", ex)
-            return {"timeout_s": self.timeout_s, "timeout": True}
+            event = BlockEvent(self.timeout_s, True)
+            await self.event_bus.publish(
+                'block_confirmed',
+                event)  # publish event in case of an AssertionError
+        return
 
     async def run(self):
         self.rpc_v2.create_session()
         start_block_count = await self.rpc_v2.block_count()
         self.stats_manager.set_start_block_count(start_block_count)
 
-        conf_lst = []
         for counter in range(self.start_index,
                              self.start_index + self.block_count):
-
             seed_index = counter if self.is_independent else self.start_index
-            conf_lst.append(await self._generate_and_confirm_block(seed_index))
+            await self._generate_and_confirm_block(seed_index)
 
         end_block_count = await self.rpc_v2.block_count()
         await self.rpc_v2.close_session()
         self.stats_manager.set_end_block_count(end_block_count)
-        self.stats_manager.print_stats(conf_lst)
+        self.stats_manager.print_stats()  # no longer pass conf_lst
 
         return self.block_count

@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from nanolab.src.nano_rpc import NanoRpcV2
+from nanolab.publisher.block_event import BlockConfirmationEvent
 from nanolab.src.utils import get_config_parser
 import asyncio
 import time
@@ -39,7 +40,8 @@ class IBlockAsserts(ABC):
 
 class BlockAsserts(IBlockAsserts):
 
-    def __init__(self, node_name=None):
+    def __init__(self, event_bus=None, node_name=None):
+        self.event_bus = event_bus
         conf_p = get_config_parser()
         node_name = node_name if node_name else conf_p.get_nodes_name()[:-1]
         self.nano_rpc_default = NanoRpcV2(conf_p.get_node_rpc(node_name))
@@ -97,19 +99,36 @@ class BlockAsserts(IBlockAsserts):
             raise AssertionError(
                 f"{len(list(unconfirmed_blocks))} blocks are not confirmed")
 
+    async def _publish_block_confirmation_event(self, wait_s, block_hash,
+                                                timeout):
+        if not self.event_bus: return
+        event = BlockConfirmationEvent(block_hash, timeout, wait_s)
+        await self.event_bus.publish('block_confirmed', event)
+
     async def assert_blocks_confirmed_wait(self, block_hashes, wait_s,
                                            interval):
-        start_time = time.time()
         batch_size = 1000
-        while time.time() - start_time < wait_s:
-            unconfirmed_blocks = await self._unconfirmed_blocks(
-                block_hashes, batch_size=batch_size)
-            if not unconfirmed_blocks:
-                return
-            await asyncio.sleep(interval)
-        raise AssertionError(
-            f"{len(list(unconfirmed_blocks))} unconfirmed blocks! e.g. {list(unconfirmed_blocks)[0]}"
-        )
+        unconfirmed_blocks = set(block_hashes)
+        start_time = time.time()
+        while time.time() - start_time < wait_s and unconfirmed_blocks:
+            confirmed_blocks = await self._blocks_confirmed(
+                list(unconfirmed_blocks)[:batch_size])
+            for block_hash in confirmed_blocks:
+                conf_duration = time.time() - start_time
+                await self._publish_block_confirmation_event(
+                    conf_duration, block_hash, True)
+                unconfirmed_blocks.remove(block_hash)
+            if unconfirmed_blocks:
+                await asyncio.sleep(interval)
+
+        if unconfirmed_blocks:
+            # If there are any remaining unconfirmed blocks, raise an AssertionError and send the events.
+            for block_hash in unconfirmed_blocks:
+                await self._publish_block_confirmation_event(
+                    wait_s, block_hash, False)
+            raise AssertionError(
+                f"{len(list(unconfirmed_blocks))} unconfirmed blocks! e.g. {list(unconfirmed_blocks)[0]}"
+            )
 
     async def assert_single_block_confirmed(self, block_hash: str):
         await self.assert_blocks_confirmed([block_hash])

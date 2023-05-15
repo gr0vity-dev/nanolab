@@ -50,7 +50,7 @@ class ConfirmationCalculator:
         # You might want to change the structure of the data in the list
         self.events.append({
             "conf_duration": event.conf_duration,
-            "timeout": event.timeout
+            "timeout": not event.confirmed
         })
 
     def set_start_block_count(self, start_block_count):

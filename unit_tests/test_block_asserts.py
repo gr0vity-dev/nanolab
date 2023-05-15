@@ -2,6 +2,7 @@ import pytest
 from unittest.mock import MagicMock, patch
 from os import environ
 from nanolab.publisher.block_asserts import BlockAsserts  # Import your class here
+from nanolab.publisher.event_bus import EventBus
 import asyncio
 import itertools
 import time
@@ -20,7 +21,7 @@ def block_asserts(mock_rpc):
     environ[
         'NL_CONF_FILE'] = 'nl_config.toml'  # Replace with your test config file
 
-    block_asserts = BlockAsserts(node_name='nanomock_pr1')
+    block_asserts = BlockAsserts(EventBus(), node_name='nanomock_pr1')
     return block_asserts
 
 
@@ -173,3 +174,53 @@ async def test_assert_blocks_confirmed_wait(block_asserts):
     # We use a small tolerance to account for the time spent on other operations.
     assert (end_time - start_time) < 2 * interval + 0.1
     assert (end_time - start_time) > 2 * interval - 0.1
+
+
+@pytest.mark.asyncio
+async def test_assert_blocks_confirmed_wait(block_asserts):
+    block_hashes = ["block_hash1", "block_hash2"]
+    wait_s = 2
+    interval = 0.3
+
+    # Create futures with the desired results for each block hash
+    futures1 = [asyncio.Future(), asyncio.Future(), asyncio.Future()]
+    futures1[0].set_result({"confirmed": "false"})
+    futures1[1].set_result({"confirmed": "false"})
+    futures1[2].set_result({"confirmed": "true"})
+
+    futures2 = [
+        asyncio.Future(),
+        asyncio.Future(),
+        asyncio.Future(),
+        asyncio.Future(),
+        asyncio.Future()
+    ]
+    futures2[0].set_result({"confirmed": "false"})
+    futures2[1].set_result({"confirmed": "false"})
+    futures2[2].set_result({"confirmed": "false"})
+    futures2[3].set_result({"confirmed": "false"})
+    futures2[4].set_result({"confirmed": "true"})
+
+    # Mock _fetch_block_info to return different results for each block hash
+    async def mock_fetch_block_info(block_hash):
+        if block_hash == "block_hash1":
+            return futures1.pop(0).result()
+        elif block_hash == "block_hash2":
+            return futures2.pop(0).result()
+
+    block_asserts._fetch_block_info = mock_fetch_block_info
+
+    start_time = time.time()
+    try:
+        await block_asserts.assert_blocks_confirmed_wait(
+            block_hashes, wait_s, interval)
+    except AssertionError:
+        pytest.fail(
+            "assert_blocks_confirmed_wait() raised AssertionError unexpectedly!"
+        )
+    end_time = time.time()
+
+    # Check that the method waited approximately 4*interval before returning.
+    # We use a small tolerance to account for the time spent on other operations.
+    assert (end_time - start_time) < 4 * interval + 0.1
+    assert (end_time - start_time) > 4 * interval - 0.1

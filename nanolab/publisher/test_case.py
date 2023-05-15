@@ -63,7 +63,7 @@ class BlockGenerationTestCase(ITestCase):
                 "timeout": False
             }
         except AssertionError as ex:
-            print("DEBUG >>>>> spam_change_wait_conf AssertionError", ex)
+            print("DEBUG", ex)
             return {"timeout_s": self.timeout_s, "timeout": True}
 
     async def run(self):

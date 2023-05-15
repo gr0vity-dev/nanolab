@@ -91,11 +91,11 @@ class BlockAsserts(IBlockAsserts):
         return unconfirmed_blocks
 
     async def assert_blocks_confirmed(self, block_hashes):
-        unconfirmed_blocks = self._unconfirmed_blocks(
+        unconfirmed_blocks = await self._unconfirmed_blocks(
             block_hashes, batch_size=len(block_hashes))
         if unconfirmed_blocks:
             raise AssertionError(
-                f"{len(unconfirmed_blocks)} blocks are not confirmed")
+                f"{len(list(unconfirmed_blocks))} blocks are not confirmed")
 
     async def assert_blocks_confirmed_wait(self, block_hashes, wait_s,
                                            interval):
@@ -107,7 +107,9 @@ class BlockAsserts(IBlockAsserts):
             if not unconfirmed_blocks:
                 return
             await asyncio.sleep(interval)
-        raise AssertionError("Not all blocks confirmed within the wait time")
+        raise AssertionError(
+            f"{len(list(unconfirmed_blocks))} unconfirmed blocks! e.g. {list(unconfirmed_blocks)[0]}"
+        )
 
     async def assert_single_block_confirmed(self, block_hash: str):
         await self.assert_blocks_confirmed([block_hash])

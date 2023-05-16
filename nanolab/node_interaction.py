@@ -11,7 +11,7 @@ import itertools
 from nanolab.loggers.logger_manager import LoggingManager
 
 
-async def start_loggers(logger_params: dict, sink_params: dict):
+async def start_loggers(logger_params: Dict, sink_params: List[Dict]):
     logger_manager = LoggingManager(logger_params, sink_params)
     await logger_manager.start_logging()
 

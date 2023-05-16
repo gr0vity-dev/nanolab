@@ -34,6 +34,8 @@ class ConfigPathHandler:
             self.is_local_path = True
         else:
             testcase_name = testcase_alias
+
+        environ["LAB_TESTCASE"] = testcase_name
         return testcase_name
 
     def get_testcase_name(self):

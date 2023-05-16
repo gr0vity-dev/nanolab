@@ -1,6 +1,7 @@
 import time
 import nanolab.node_interaction as nni
 import asyncio
+from nanolab.publisher.test_case import TestCaseFactory
 
 
 class TestClass:
@@ -27,6 +28,11 @@ class NodeInteraction:
 
     def start_logger(self, logger_params, sink_params):
         asyncio.run(nni.start_loggers(logger_params, sink_params))
+
+    def publish_create(self, params):
+        # Create the test case using the factory
+        test_case = TestCaseFactory.create(params)
+        asyncio.run(test_case.run())
 
     def publish_blocks(self, publish_params):
         '''

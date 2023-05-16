@@ -2,6 +2,7 @@ from sqlalchemy import create_engine, Column, Integer, String, Float, ForeignKey
 from sqlalchemy.orm import sessionmaker, relationship, declarative_base
 from nanolab.loggers.contracts import ISink, LogData
 from nanolab.decorators import print_dot
+from os import environ
 
 Base = declarative_base()
 
@@ -37,7 +38,8 @@ class SqlSink(ISink):
     def __init__(self, **kwargs):
         self.db_uri = kwargs['db_uri']
         self.milestones = kwargs['milestones']
-        self.testcase_name = kwargs['testcase_name']
+        self.testcase_name = kwargs.get(
+            'testcase_name', environ.get("LAB_TESTCASE", "UNDEFINED"))
         self.start_date = None
         self.end_date = None
         self.status = 'Running'

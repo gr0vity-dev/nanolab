@@ -79,26 +79,6 @@ class ConfigLoader:
                     f"Mandatory variable '{var}' is missing in '{key}'. Variables defined: {list(variables.keys())}"
                 )
 
-    # def _replace_vars_in_commands(self, commands, variables):
-    #     for command in commands:
-    #         self._replace_vars_in_dict(command, variables)
-    #     return commands
-
-    # def _replace_vars_in_dict(self, item, variables):
-    #     if isinstance(item, dict):
-    #         for key, value in item.items():
-    #             if isinstance(value, str):
-    #                 item[key] = self._replace_vars_in_string(value, variables)
-    #             else:
-    #                 self._replace_vars_in_dict(value, variables)
-    #     elif isinstance(item, list):
-    #         for value in item:
-    #             self._replace_vars_in_dict(value, variables)
-
-    # def _replace_vars_in_string(self, value, variables):
-    #     for var, var_value in variables.items():
-    #         value = value.replace(f'{{{var}}}', var_value)
-    #     return value
     def _replace_vars_in_commands(self, commands, variables):
         for command in commands:
             self._replace_vars_in_dict(command, variables)

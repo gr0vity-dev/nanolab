@@ -57,8 +57,8 @@ class node_handshake_id:
                 ctx, recvd_response.cookie, signing_key, verifying_key)
             s.sendall(response.serialise())
 
-            vk = ed25519_blake2b.keys.VerifyingKey(recvd_response.account)
-            vk.verify(recvd_response.sig, msg_handshake.cookie)
+            # vk = ed25519_blake2b.keys.VerifyingKey(recvd_response.account)
+            # vk.verify(recvd_response.sig, msg_handshake.cookie)
         except TypeError:
             raise ValueError("HandshakeExchangeFail")
 

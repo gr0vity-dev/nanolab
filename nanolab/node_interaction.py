@@ -196,10 +196,10 @@ class SocketPublish:
         messages_per_socket, remainder = divmod(len(messages), num_sockets)
         tasks = []
         sockets_to_use = sockets[1:] if skip_first_socket else sockets
-        for i, socket in enumerate(sockets_to_use,
-                                   start=int(skip_first_socket)):
+        for i, socket in enumerate(sockets_to_use):
             start = i * messages_per_socket + min(i, remainder)
             end = start + messages_per_socket + (1 if i < remainder else 0)
+            print(socket['peer'], str(messages[start].block.hash_string()))
             tasks.append(self.publish_message(socket, messages[start:end]))
         return tasks
 

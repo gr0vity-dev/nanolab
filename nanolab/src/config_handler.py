@@ -15,10 +15,11 @@ class ConfigPathHandler:
         self.local_config_path = None
         self.base_path = Path(environ.get("NL_PATH") or str(Path.cwd()))
         self.testcase_name = self._set_testcase_name(testcase_alias.strip())
-        self.resources_dir = environ.get("NL_RES_DIR", "resources")
-        self.resources_path = self.base_path / self.resources_dir / self.testcase_name
-        self.downloads_path = self.base_path / self.resources_dir / self.testcase_name / "dowlnoads"
-        self.config_copy_file_path = self.resources_path / "config_copy.json"
+        self.resources_dir = environ.get("NL_RES_DIR", "testcases")
+        self.resources_path = self.base_path / self.resources_dir
+        self.downloads_path = self.base_path / self.resources_dir / "dowlnoads"
+        self.config_copy_file_path = self.resources_path / \
+            f"{self.testcase_name}_config.json"
         self.resolved_config_file_path = self.resources_path / "resolved_config.json"
         self.snippets_path = self.base_path / "snippets"
 
@@ -26,7 +27,7 @@ class ConfigPathHandler:
         self.downloads_path.mkdir(parents=True, exist_ok=True)
 
     def _set_testcase_name(self, testcase_alias):
-        #for ease of use we allow alias to be either local path to disk, or downloadable alias
+        # for ease of use we allow alias to be either local path to disk, or downloadable alias
         if testcase_alias.endswith(".json"):
             self.local_config_path = testcase_alias
             config = self.conf_rw.read_json(testcase_alias)

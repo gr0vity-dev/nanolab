@@ -12,7 +12,7 @@ class CommandMixinBase:
     def _get_completed_variables(self):
         variables = self.command_instance.command_config.get('variables', {})
 
-        #add global variables
+        # add global variables
         variables["docker_tag"] = environ["docker_tag"]
         return variables
 

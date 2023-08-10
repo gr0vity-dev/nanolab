@@ -70,15 +70,16 @@ class ArgParseHandler:
         #
         extract_packaged_data_to_disk(path_handler.get_snippets_path())
 
-        #copy config to disk
+        # copy config to disk
         config_path = resource_handler.copy_config_file(
             path_handler.config_copy_file_path)
 
-        #resolve and downlaod resources defiend in the config
+        # resolve and downlaod resources defiend in the config
         resolved_config = resource_handler.download_and_replace_resources(
             config_path, path_handler.downloads_path)
-        #replace docker_tags with commandline
-        if self.args.image: resolved_config["docker_tags"] = self.args.image
+        # replace docker_tags with commandline
+        if self.args.image:
+            resolved_config["docker_tags"] = self.args.image
 
         resolved_path = path_handler.get_resolved_config_path()
         snippet_path = path_handler.get_snippets_path()

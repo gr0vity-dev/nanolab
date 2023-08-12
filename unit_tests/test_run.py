@@ -59,8 +59,8 @@ def contains_expected_substring(expected_substring):
 def remove_nanolab_resources():
     if os.path.exists("./unit_tests/snippets"):
         shutil.rmtree("./unit_tests/snippets")
-    if os.path.exists("./unit_tests/resources"):
-        shutil.rmtree("./unit_tests/resources")
+    if os.path.exists("./unit_tests/testcases"):
+        shutil.rmtree("./unit_tests/testcases")
 
 
 class TestRun(unittest.TestCase):

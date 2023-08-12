@@ -42,6 +42,9 @@ class ConfigPathHandler:
     def get_testcase_name(self):
         return self.testcase_name
 
+    def get_resources_dir(self):
+        return self.resources_dir
+
     def get_resources_path(self):
         return self.resources_path
 

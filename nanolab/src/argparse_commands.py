@@ -1,6 +1,6 @@
 # nanolab/command/argparse_commands.py
 
-from os import environ
+from os import environ, listdir
 from .github import GitHubAPI
 import argparse
 from nanolab.src.config_handler import ConfigPathHandler, ConfigResourceHandler
@@ -24,33 +24,21 @@ def parse_args():
                             type=str,
                             default='gr0vity-dev',
                             help='GitHub user (default: gr0vity-dev)')
-    run_parser.add_argument(
-        '--gh-repo',
-        type=str,
-        default='nanolab-configs',
-        help='GitHub repository (default: nanolab-configs)')
-    run_parser.add_argument(
-        '--gh-path',
-        type=str,
-        default='default',
-        help='Path to testcases within the repository (default: default)')
+    run_parser.add_argument('--gh-repo', type=str, default='nanolab-configs',
+                            help='GitHub repository (default: nanolab-configs)')
+    run_parser.add_argument('--gh-path', type=str, default='default',
+                            help='Path to testcases within the repository (default: default)')
 
     # List command
     list_parser = subparsers.add_parser("list", help="List testcases")
-    list_parser.add_argument('--gh-user',
-                             type=str,
-                             default='gr0vity-dev',
-                             help='GitHub user (default: gr0vity-dev)')
     list_parser.add_argument(
-        '--gh-repo',
-        type=str,
-        default='nanolab-configs',
-        help='GitHub repository (default: nanolab-configs)')
-    list_parser.add_argument(
-        '--gh-path',
-        type=str,
-        default='default',
-        help='Path to testcases within the repository (default: default)')
+        '--gh-user', type=str, default='gr0vity-dev', help='GitHub user (default: gr0vity-dev)')
+    list_parser.add_argument('--gh-repo', type=str, default='nanolab-configs',
+                             help='GitHub repository (default: nanolab-configs)')
+    list_parser.add_argument('--gh-path', type=str, default='default',
+                             help='Path to testcases within the repository (default: default)')
+    list_parser.add_argument('--local', action='store_true',
+                             help="List testcases from local directory './testcases/'")
 
     return parser.parse_args()
 
@@ -92,12 +80,26 @@ class ArgParseHandler:
         ConfigCommandExecutor.execute_commands(final_config)
 
     def list_testcases(self):
-        files = self.github_api.get_files()
+        if self.args.local:
+            # Create a ConfigPathHandler instance
+            # Placeholder since we don't need a specific testcase_alias for listing
+            path_handler = ConfigPathHandler("placeholder")
 
-        if files:
-            for file in files:
-                if file["name"].endswith(".json"):
-                    print(file["name"][:-5])
+            # Get the base path for test cases
+            base_path = path_handler.get_resources_dir()
+
+            # If --local flag is set, list test cases from the local directory
+            for file in listdir(base_path):
+                if file.endswith('_config.json') and file != 'resolved_config.json':
+                    # Prepend the path and remove the '.json' extension before printing
+                    print(f"{base_path}/{file}")
+        else:
+            # Otherwise, list test cases from the GitHub repository
+            files = self.github_api.get_files()
+            if files:
+                for file in files:
+                    if file["name"].endswith(".json"):
+                        print(file["name"][:-5])
 
     def get_args(self):
         return self.args

@@ -21,7 +21,7 @@ class RPCLogger(ILogger):
         self.node_name = node_name
         self.rpc_url = rpc_url
         self.expected_blocks_count = expected_blocks_count
-        self.timeout = timeout
+        self.timeout = int(timeout)
         self.nanorpc = NanoRpc(self.rpc_url)
         if count_start is None or cemented_start is None:
             self.count_start, self.cemented_start = self._get_block_count()
@@ -56,9 +56,10 @@ class RPCLogger(ILogger):
             percent_checked = (
                 (count - self.count_start) / self.expected_blocks_count) * 100
 
-            #Loggers are cerated before the publishing starts.
-            #Elapsed is started when the first blcok is received by the node
-            if percent_checked == 0: start_time = time.time()
+            # Loggers are cerated before the publishing starts.
+            # Elapsed is started when the first blcok is received by the node
+            if percent_checked == 0:
+                start_time = time.time()
             elapsed_time = int(time.time() - start_time)
 
             cps = (cemented - self.previous_cemented) / max(

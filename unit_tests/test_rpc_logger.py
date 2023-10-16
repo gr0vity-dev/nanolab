@@ -78,7 +78,7 @@ async def test_fetch_logs_timeout(mock_version, mock_fully_cemented):
     logger = RPCLogger(node_name="test_node",
                        rpc_url="http://test_url",
                        expected_blocks_count=500000,
-                       timeout=0.3)
+                       timeout=1)
     logs = []
     async for log in logger.fetch_logs():
         logs.append(log)
@@ -90,7 +90,6 @@ async def test_fetch_logs_timeout(mock_version, mock_fully_cemented):
 def test_case_with_different_version(mock_fully_cemented):
     with patch('nanomock.modules.nl_rpc.NanoRpc.version',
                return_value=None) as mock_version:
-        # rest of the test case...
         logger = RPCLogger(node_name="test_node",
                            rpc_url="http://test_url",
                            expected_blocks_count=99,

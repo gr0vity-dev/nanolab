@@ -1,4 +1,4 @@
-{    
+{
     "nanomock_reset_copy_ledger_create": {
         "mandatory_vars": [
             "LEDGER",
@@ -20,7 +20,8 @@
                 "key": "nanomock_copy_ledgers",
                 "variables": {
                     "LEDGER": "{LEDGER}",
-                    "SETUP_NODES": "{SETUP_NODES}"
+                    "SETUP_NODES": "{SETUP_NODES}",
+                    "IS_ROCKS_DB": "{IS_ROCKS_DB}"
                 }
             }
         ]
@@ -60,7 +61,7 @@
             "PATH",
             "VALUE"
         ],
-        "commands": [            
+        "commands": [
             {
                 "type": "bash",
                 "command": "nanomock conf_edit --payload '{{\"path\" : \"{PATH}\",  \"value\" : \"{VALUE}\"}}'"
@@ -73,11 +74,11 @@
             "PATH",
             "VALUE"
         ],
-        "commands": [            
+        "commands": [
             {
                 "type": "bash",
                 "command": "nanomock conf_edit --payload '{{\"path\" : \"{PATH}\",  \"value\" : \"{VALUE}\"}}'"
-            },           
+            },
             {
                 "type": "bash",
                 "command": "nanomock create"
@@ -90,11 +91,12 @@
         "mandatory_vars": [
             "SETUP_NODES",
             "LEDGER"
+
         ],
         "commands": [
             {
                 "type": "bash",
-                "command": "for i in {SETUP_NODES}; do cp {LEDGER} ./nano_nodes/$i/NanoTest/data.ldb; done"
+                "command": "for i in {SETUP_NODES}; do if [ {IS_ROCKS_DB} = true ]; then rm -rf ./nano_nodes/$i/NanoTest/rocksdb; && cp -r {LEDGER} ./nano_nodes/$i/NanoTest/rocksdb; else cp {LEDGER} ./nano_nodes/$i/NanoTest/data.ldb; fi; done"
             }
         ]
     },
@@ -106,8 +108,8 @@
                 "command": "nanomock start && nanomock init_wallets"
             }
         ]
-    },    
-    
+    },
+
     "sql_logger": {
         "mandatory_vars": [
             "CONNECTION_STRING",

@@ -95,7 +95,7 @@
         "commands": [
             {
                 "type": "bash",
-                "command": "for i in {SETUP_NODES}; do if [ {IS_ROCKS_DB} = true ]; then rm -rf ./nano_nodes/$i/NanoTest/rocksdb && cp -r {LEDGER} ./nano_nodes/$i/NanoTest/rocksdb; else cp {LEDGER} ./nano_nodes/$i/NanoTest/data.ldb; fi; done"
+                "command": "for i in {SETUP_NODES}; do if [ \"{IS_ROCKS_DB}\" = true ]; then rm -rf ./nano_nodes/$i/NanoTest/rocksdb && cp -r {LEDGER} ./nano_nodes/$i/NanoTest/rocksdb; else cp {LEDGER} ./nano_nodes/$i/NanoTest/data.ldb; fi; done"
             }
         ]
     },

@@ -35,7 +35,7 @@ BPS: {bps:>7} (avg {bps_avg:>7.2f}) ({percent_checked:>6.2f}%)")
 
     def end(self):
         if self.pass_above:
-            print("PASS") if self.percent_cemented >= self.pass_above else print(
-                "FAIL")
+            status = "PASS" if self.percent_cemented >= self.pass_above else "FAIL"
         else:
-            print("PASS") if self.percent_cemented == self.pass_at else print("FAIL")
+            status = "PASS" if self.percent_cemented == self.pass_at else "FAIL"
+        print(status)

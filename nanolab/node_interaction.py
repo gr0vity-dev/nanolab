@@ -83,7 +83,7 @@ def get_blocks_from_disk(params: dict):
 class SocketPublish:
 
     def __init__(self, params: Dict[str, Any]):
-        self.bps = params["bps"]
+        self.bps = int(params["bps"])
         self.peers = params.get("peers")
         self.split = params.get("split", False)
         # skips 1st socket (genesis)

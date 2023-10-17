@@ -83,7 +83,7 @@ class ConfigResourceHandler():
         global_resources = config.get("global", {})
 
         for key, value in global_resources.items():
-            if value.startswith("http://") or value.startswith("https://"):
+            if str(value).startswith("http://") or value.startswith("https://"):
                 # Download the remote file
                 downloaded_path = self._download_url(value, destination_path)
                 # Replace the URL with the downloaded file path

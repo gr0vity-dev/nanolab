@@ -7,6 +7,10 @@ class ConsoleSink(ISink):
     """A storage that writes logs to the console."""
     percent_cemented = 0
 
+    def __init__(self, **kwargs):
+        self.pass_above = kwargs.get("pass_above")
+        self.pass_at = kwargs.get("pass_at", 100)
+
     def store_logs(self, logs: LogData):
         """Store logs by printing them to the console."""
         node_name = logs.node_name
@@ -30,4 +34,8 @@ class ConsoleSink(ISink):
 BPS: {bps:>7} (avg {bps_avg:>7.2f}) ({percent_checked:>6.2f}%)")
 
     def end(self):
-        print("PASS") if self.percent_cemented == 100 else print("FAIL")
+        if self.pass_above:
+            status = "PASS" if self.percent_cemented >= self.pass_above else "FAIL"
+        else:
+            status = "PASS" if self.percent_cemented == self.pass_at else "FAIL"
+        print(status)

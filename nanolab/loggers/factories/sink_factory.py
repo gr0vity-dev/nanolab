@@ -8,7 +8,7 @@ class SinkFactory:
     @staticmethod
     def create_storage(sink_type, config_params_dict):
         if sink_type == 'console':
-            return ConsoleSink()
+            return ConsoleSink(**config_params_dict)
         elif sink_type == 'sql':
             return SqlSink(**config_params_dict)
         elif sink_type == 'csv':

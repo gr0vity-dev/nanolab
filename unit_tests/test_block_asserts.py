@@ -119,7 +119,7 @@ async def test_assert_blocks_confirmed_wait(block_asserts):
 
 
 @pytest.mark.asyncio
-async def test_assert_blocks_confirmed(block_asserts):
+async def test_assert_blocks_confirmed_2(block_asserts):
     block_hashes = ["block_hash1", "block_hash2", "block_hash3"]
 
     # Create futures with the desired results
@@ -145,7 +145,7 @@ async def test_assert_blocks_confirmed(block_asserts):
 
 
 @pytest.mark.asyncio
-async def test_assert_blocks_confirmed_wait(block_asserts):
+async def test_assert_blocks_confirmed_wait_2(block_asserts):
     block_hashes = ["block_hash1"]
     wait_s = 1
     interval = 0.3
@@ -177,7 +177,7 @@ async def test_assert_blocks_confirmed_wait(block_asserts):
 
 
 @pytest.mark.asyncio
-async def test_assert_blocks_confirmed_wait(block_asserts):
+async def test_assert_blocks_confirmed_wait_3(block_asserts):
     block_hashes = ["block_hash1", "block_hash2"]
     wait_s = 2
     interval = 0.3

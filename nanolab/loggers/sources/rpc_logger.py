@@ -20,7 +20,7 @@ class RPCLogger(ILogger):
                  cemented_start=None):
         self.node_name = node_name
         self.rpc_url = rpc_url
-        self.expected_blocks_count = expected_blocks_count
+        self.expected_blocks_count = int(expected_blocks_count)
         self.timeout = int(timeout)
         self.nanorpc = NanoRpc(self.rpc_url)
         if count_start is None or cemented_start is None:

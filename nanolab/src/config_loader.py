@@ -123,10 +123,9 @@ class ConfigLoader:
             for item in command:
                 self._apply_variables_to_command(global_variables, item)
 
-    def _replace_global_variables(self, global_variables: dict,
-                                  value: str) -> str:
+    def _replace_global_variables(self, global_variables: dict, value: str) -> str:
         for global_key, global_value in global_variables.items():
-            value = value.replace(f"{{{global_key}}}", global_value)
+            value = value.replace(f"{{{global_key}}}", str(global_value))
         return value
 
 

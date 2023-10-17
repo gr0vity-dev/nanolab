@@ -27,9 +27,12 @@ async def xnolib_publish(params: dict):
 
 def read_blocks_from_disk(path, seeds=False, hashes=False, blocks=False):
     res = ConfigReadWrite().read_json(path)
-    if seeds: return res["s"]
-    if hashes: return res["h"]
-    if blocks: return res["b"]
+    if seeds:
+        return res["s"]
+    if hashes:
+        return res["h"]
+    if blocks:
+        return res["b"]
     return res
 
 
@@ -65,11 +68,13 @@ def get_blocks_from_disk(params: dict):
     all_blocks = read_blocks_from_disk(blocks_path)
 
     params = set_default_params(params, all_blocks)
-    subset_start_index = params["subset"]["start_index"]
-    subset_end_index = params["subset"]["end_index"]
+    subset_start_index = int(params["subset"]["start_index"])
+    subset_end_index = int(params["subset"]["end_index"])
+    start_round = int(params["start_round"])
+    end_round = int(params["end_round"])
 
-    blocks = get_block_subset(all_blocks, params["start_round"],
-                              params["end_round"], subset_start_index,
+    blocks = get_block_subset(all_blocks, start_round,
+                              end_round, subset_start_index,
                               subset_end_index)
 
     return blocks
@@ -78,7 +83,7 @@ def get_blocks_from_disk(params: dict):
 class SocketPublish:
 
     def __init__(self, params: Dict[str, Any]):
-        self.bps = params["bps"]
+        self.bps = int(params["bps"])
         self.peers = params.get("peers")
         self.split = params.get("split", False)
         # skips 1st socket (genesis)
@@ -224,7 +229,7 @@ class SocketPublish:
         tasks = self.create_publish_tasks(self.sockets, messages)
         await asyncio.gather(*tasks)
         # make sure the last few blocks are published.
-        #ideally this would check if all messages are received
+        # ideally this would check if all messages are received
         await asyncio.sleep(15)
 
         message_count = len(messages)

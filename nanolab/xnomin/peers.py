@@ -9,6 +9,28 @@ import ed25519_blake2b
 import json
 import requests
 from nanolab.xnomin.acctools import to_account_addr, account_key
+import random
+
+
+class IdDispenser:
+    MODE_SEQUENTIAL = "sequential"
+    MODE_RANDOM = "random"
+    MIN_ID = 0x1000000000000000
+
+    def __init__(self, mode=MODE_RANDOM):
+        self.mode = mode
+        self.current_id = self.MIN_ID
+
+    def get_next(self):
+        if self.mode == self.MODE_SEQUENTIAL:
+            self.current_id += 1
+            return self.current_id
+        elif self.mode == self.MODE_RANDOM:
+            value = random.getrandbits(64)
+            if value < self.MIN_ID:
+                value += self.MIN_ID
+            return value
+        return 0  # Default case, should ideally never reach here
 
 
 def get_peers_from_service(ctx: dict, url=None):
@@ -52,7 +74,8 @@ logger = get_logger()
 
 
 def hexlify(data) -> str:
-    if data is None: return 'None'
+    if data is None:
+        return 'None'
     return binascii.hexlify(data).decode("utf-8").upper()
 
 
@@ -142,7 +165,9 @@ class message_type:
 class message_header:
 
     def __init__(self, net_id: network_id, versions: List[int],
-                 msg_type: message_type, ext: int):
+                 msg_type: message_type, ext: int, id=None):
+        self.id_dispenser = IdDispenser()
+        self.id = self.id_dispenser.get_next()
         self.ext = ext
         self.net_id = net_id
         self.ver_max = versions[0]
@@ -152,6 +177,7 @@ class message_header:
         assert isinstance(self.msg_type, message_type)
 
     def serialise_header(self) -> bytes:
+        id = self.id or self.id_dispenser.get_next()
         header = b""
         header += ord('R').to_bytes(1, "big")
         header += ord(str(self.net_id)).to_bytes(1, "big")
@@ -160,6 +186,7 @@ class message_header:
         header += self.ver_min.to_bytes(1, "big")
         header += self.msg_type.type.to_bytes(1, "big")
         header += self.ext.to_bytes(2, "little")
+        header += id.to_bytes(8, "big")
         return header
 
     def is_query(self) -> bool:
@@ -202,14 +229,16 @@ class message_header:
 
     @classmethod
     def parse_header(cls, data: bytes):
-        assert (len(data) == 8)
+        assert (len(data) == 16)
         if data[0] != ord('R'):
             raise ValueError("ParseErrorBadMagicNumber")
         net_id = network_id(data[1])
         versions = [data[2], data[3], data[4]]
         msg_type = message_type(data[5])
-        ext = int.from_bytes(data[6:], "little")
-        return message_header(net_id, versions, msg_type, ext)
+        ext = int.from_bytes(data[6:2], "little")
+        id = int.from_bytes(data[8:], "big")
+        print(f"parse_header, {versions}, {msg_type}, {ext}, {id}")
+        return message_header(net_id, versions, msg_type, ext, id)
 
     def telemetry_ack_size(self) -> int:
         telemetry_size_mask = 0x3ff
@@ -467,8 +496,8 @@ class block_state:
 class ip_addr:
 
     def __init__(
-        self,
-        ipv6: Union[str, ipaddress.IPv6Address] = ipaddress.IPv6Address(0)):
+            self,
+            ipv6: Union[str, ipaddress.IPv6Address] = ipaddress.IPv6Address(0)):
         if isinstance(ipv6, str):
             self.ipv6 = ipaddress.IPv6Address(ipv6)
         else:
@@ -562,8 +591,8 @@ class Peer:
         from nanolab.xnomin.telemetry_req import telemetry_ack
         # Add 'incoming' argument when peer service code gets updated
         peer = Peer(ip_addr(json_peer['ip']), json_peer['port'],
-                    json_peer['score'], json_peer['is_voting'])  #,
-        #json_peer['last_seen'])
+                    json_peer['score'], json_peer['is_voting'])  # ,
+        # json_peer['last_seen'])
         if 'telemetry' in json_peer and json_peer['telemetry'] is not None:
             peer.telemetry = telemetry_ack.from_json(json_peer['telemetry'])
         if 'peer_id' in json_peer and json_peer['peer_id']:

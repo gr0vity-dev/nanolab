@@ -132,7 +132,7 @@ class SocketPublish:
     def __set_sockets_handshake(self):
         ctx = self.get_xnolib_context(peers=self.peers)
         msgtype = message_type_enum.publish
-        hdr = message_header(ctx['net_id'], [18, 18, 18],
+        hdr = message_header(ctx['net_id'], [19, 19, 19],
                              message_type(msgtype), 0)
         hdr.set_block_type(block_type_enum.state)
         all_peers = get_peers_from_service(ctx)

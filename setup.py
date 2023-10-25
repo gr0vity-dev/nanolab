@@ -3,8 +3,8 @@ from setuptools import setup, find_packages
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-setup(name="nanolab",
-      version="0.0.15",
+setup(name="nanolab_debug",
+      version="0.0.1",
       author="gr0vity",
       description="testing tool using nanomock",
       long_description=long_description,
@@ -16,6 +16,6 @@ setup(name="nanolab",
                         "sqlalchemy", "aiohttp", "nanolog_parser"],
       entry_points={
           'console_scripts': [
-              'nanolab=nanolab.main:main',
+              'nanolab_debug=nanolab.main:main',
           ],
       })

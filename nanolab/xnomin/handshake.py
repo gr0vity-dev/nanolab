@@ -44,21 +44,21 @@ class node_handshake_id:
             cls, ctx: dict, s: socket.socket,
             signing_key: ed25519_blake2b.SigningKey,
             verifying_key: ed25519_blake2b.VerifyingKey) -> bytes:
-        hdr = message_header(ctx['net_id'], [18, 18, 18], message_type(10), 1)
+        hdr = message_header(ctx['net_id'], [19, 19, 19], message_type(10), 1)
         msg_handshake = handshake_query(hdr)
         s.sendall(msg_handshake.serialise())
         try:
-            data = read_socket(s, 136)
-            hdr = message_header.parse_header(data[0:8])
+            data = read_socket(s, 144)
+            hdr = message_header.parse_header(data[0:16])
             recvd_response = handshake_response_query.parse_query_response(
-                hdr, data[8:])
+                hdr, data[16:])
 
             response = handshake_response.create_response(
                 ctx, recvd_response.cookie, signing_key, verifying_key)
             s.sendall(response.serialise())
 
-            vk = ed25519_blake2b.keys.VerifyingKey(recvd_response.account)
-            vk.verify(recvd_response.sig, msg_handshake.cookie)
+            # vk = ed25519_blake2b.keys.VerifyingKey(recvd_response.account)
+            # vk.verify(recvd_response.sig, msg_handshake.cookie)
         except TypeError:
             raise ValueError("HandshakeExchangeFail")
 
@@ -70,8 +70,8 @@ class handshake_response_query(node_handshake_id):
     def __init__(self, hdr: message_header, cookie: bytes, account: bytes,
                  signature: bytes):
         assert isinstance(hdr, message_header)
-        assert hdr.is_query()
-        assert hdr.is_response()
+        # assert hdr.is_query()
+        # assert hdr.is_response()
 
         self.header = hdr
         self.cookie = cookie
@@ -88,7 +88,8 @@ class handshake_response_query(node_handshake_id):
     @classmethod
     def parse_query_response(cls, hdr: message_header, data: bytes):
         assert isinstance(hdr, message_header)
-        assert (len(data) == 128)
+        data_length = len(data)
+        assert (data_length == 128)
 
         cookie = data[0:32]
         account = data[32:64]
@@ -104,7 +105,7 @@ class handshake_response_query(node_handshake_id):
                         verifying_key: ed25519_blake2b.VerifyingKey):
         my_cookie = token_bytes(32)
         sig = signing_key.sign(cookie)
-        hdr = message_header(ctx['net_id'], [18, 18, 18], message_type(10), 3)
+        hdr = message_header(ctx['net_id'], [19, 19, 19], message_type(10), 3)
         return handshake_response_query(hdr, my_cookie,
                                         verifying_key.to_bytes(), sig)
 
@@ -188,7 +189,7 @@ class handshake_response(node_handshake_id):
                         signing_key: ed25519_blake2b.SigningKey,
                         verifying_key: ed25519_blake2b.VerifyingKey):
         sig = signing_key.sign(cookie)
-        hdr = message_header(ctx['net_id'], [18, 18, 18], message_type(10), 2)
+        hdr = message_header(ctx['net_id'], [19, 19, 19], message_type(10), 2)
         return handshake_response(hdr, verifying_key.to_bytes(), sig)
 
     @classmethod

@@ -1,9 +1,9 @@
 import pytest
-import nanolab.main as run
+import nanolab_debug.main as run
 from io import StringIO
 from unittest.mock import patch
 import os
-from nanolab.src.config_handler import ConfigPathHandler
+from nanolab_debug.src.config_handler import ConfigPathHandler
 import json
 
 

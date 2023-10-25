@@ -1,8 +1,8 @@
 import pytest
 from unittest.mock import MagicMock, patch
 from os import environ
-from nanolab.publisher.block_asserts import BlockAsserts  # Import your class here
-from nanolab.publisher.event_bus import EventBus
+from nanolab_debug.publisher.block_asserts import BlockAsserts  # Import your class here
+from nanolab_debug.publisher.event_bus import EventBus
 import asyncio
 import itertools
 import time

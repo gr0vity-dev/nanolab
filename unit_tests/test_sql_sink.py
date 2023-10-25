@@ -1,6 +1,6 @@
 import os
 import pytest
-from nanolab.loggers.sinks.sql_sink import SqlSink, LogData
+from nanolab_debug.loggers.sinks.sql_sink import SqlSink, LogData
 
 # This fixture will run for each test_* function
 # @pytest.fixture(autouse=True)
@@ -16,7 +16,8 @@ from nanolab.loggers.sinks.sql_sink import SqlSink, LogData
 
 def test_store_testcase():
     db_file = "unit_tests/test_store_testcase.db"
-    if os.path.exists(db_file): os.remove(db_file)
+    if os.path.exists(db_file):
+        os.remove(db_file)
     sink = SqlSink(db_uri=f'sqlite:///{db_file}',
                    milestones={10, 25, 50, 75, 90, 99, 100},
                    testcase_name='test1')
@@ -32,7 +33,8 @@ def test_store_testcase():
 
 def test_store_logs():
     db_file = "unit_tests/test_store_logs.db"
-    if os.path.exists(db_file): os.remove(db_file)
+    if os.path.exists(db_file):
+        os.remove(db_file)
     sink = SqlSink(db_uri=f'sqlite:///{db_file}',
                    milestones={10, 25, 50, 75, 90, 99, 100},
                    testcase_name='test2')
@@ -59,7 +61,8 @@ def test_store_logs():
 
 def test_update_testcase():
     db_file = "unit_tests/test_update_testcase.db"
-    if os.path.exists(db_file): os.remove(db_file)
+    if os.path.exists(db_file):
+        os.remove(db_file)
     sink = SqlSink(db_uri=f'sqlite:///{db_file}',
                    milestones={10, 25, 50, 75, 90, 99, 100},
                    testcase_name='test3')

@@ -1,7 +1,7 @@
 import unittest
 import os
 import shutil
-import nanolab.main as run
+import nanolab_debug.main as run
 import pytest
 import time
 

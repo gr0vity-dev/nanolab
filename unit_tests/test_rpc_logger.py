@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import patch, DEFAULT
-from nanolab.loggers.sources.rpc_logger import RPCLogger
-from nanolab.loggers.contracts import LogData
+from nanolab_debug.loggers.sources.rpc_logger import RPCLogger
+from nanolab_debug.loggers.contracts import LogData
 from asyncio import sleep
 
 

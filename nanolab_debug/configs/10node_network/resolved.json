@@ -1,0 +1,140 @@
+{
+    "testcase": "default_11n10pr_50k_4k_change",
+    "docker_tags": [
+        "nanocurrency/nano:V25.0RC1"
+    ],
+    "global": {
+        "BLOCK_PATH": "/mnt/nvme0n1/Crypto/Nano/projects/nanolab-configs/resources/default_11n10pr_50k_4k_change/dowlnoads/10node_bucket_rounds.json",
+        "LEDGER_PATH": "/mnt/nvme0n1/Crypto/Nano/projects/nanolab-configs/resources/default_11n10pr_50k_4k_change/dowlnoads/10pr_bucket0-1-88-90-100_10kaccs.ldb",
+        "NL_CONFIG_PATH": "/mnt/nvme0n1/Crypto/Nano/projects/nanolab-configs/resources/default_11n10pr_50k_4k_change/dowlnoads/default_11n10pr.toml"
+    },
+    "commands": [
+        {
+            "type": "bash",
+            "command": "[ -f nl_config.toml ] && nanomock down || true"
+        },
+        {
+            "type": "bash",
+            "command": "cp /mnt/nvme0n1/Crypto/Nano/projects/nanolab-configs/resources/default_11n10pr_50k_4k_change/dowlnoads/default_11n10pr.toml nl_config.toml"
+        },
+        {
+            "type": "bash",
+            "command": "nanomock conf_edit --payload '{{\"path\" : \"remote_address\",  \"value\" : \"172.17.0.1\"}}'"
+        },
+        {
+            "type": "bash",
+            "command": "nanomock conf_edit --payload '{{\"path\" : \"representatives.docker_tag\",  \"value\" : \"{docker_tag}\"}}'"
+        },
+        {
+            "type": "bash",
+            "command": "nanomock create && nanomock reset"
+        },
+        {
+            "type": "bash",
+            "command": "for i in nl_genesis nl_pr1 nl_pr2 nl_pr3 nl_pr4 nl_pr5 nl_pr6 nl_pr7 nl_pr8 nl_pr9 nl_pr10; do cp /mnt/nvme0n1/Crypto/Nano/projects/nanolab-configs/resources/default_11n10pr_50k_4k_change/dowlnoads/10pr_bucket0-1-88-90-100_10kaccs.ldb ./nano_nodes/$i/NanoTest/data.ldb; done"
+        },
+        {
+            "type": "bash",
+            "command": "nanomock start && nanomock init_wallets"
+        },
+        {
+            "skip": false,
+            "type": "threaded",
+            "commands": [
+                {
+                    "type": "python",
+                    "class": "NodeInteraction",
+                    "method": "start_logger",
+                    "delay": -0.1,
+                    "variables": {
+                        "logger_type": "rpc",
+                        "sink_type": "console",
+                        "logger_params": {
+                            "timeout": 120,
+                            "expected_blocks_count": 50000,
+                            "include_peers": ["nl_pr1" ]
+                        }
+                    }
+                },
+                {
+                    "skip": false,
+                    "type": "python",
+                    "method": "publish_blocks",
+                    "variables": {
+                        "publish_params": {
+                            "blocks_path": "/mnt/nvme0n1/Crypto/Nano/projects/nanolab-configs/resources/default_11n10pr_50k_4k_change/dowlnoads/10node_bucket_rounds.json",
+                            "bps": 1000,
+                            "start_round": 0,
+                            "end_round": 1,
+                            "subset": {
+                                "start_index": 0,
+                                "end_index": 12500
+                            }
+                        },
+                        "logger_type": "rpc",
+                        "logger_expected_count": 50000,
+                        "logger_timeout": 180,
+                        "logger_include_peers": [
+                            "nl_pr1"
+                        ]
+                    },
+                    "class": "NodeInteraction"
+                },
+                {
+                    "skip": false,
+                    "type": "python",
+                    "method": "publish_blocks",
+                    "variables": {
+                        "publish_params": {
+                            "blocks_path": "/mnt/nvme0n1/Crypto/Nano/projects/nanolab-configs/resources/default_11n10pr_50k_4k_change/dowlnoads/10node_bucket_rounds.json",
+                            "bps": 1000,
+                            "start_round": 0,
+                            "end_round": 1,
+                            "subset": {
+                                "start_index": 12500,
+                                "end_index": 25000
+                            }
+                        }
+                    },
+                    "class": "NodeInteraction"
+                },
+                {
+                    "skip": false,
+                    "type": "python",
+                    "method": "publish_blocks",
+                    "variables": {
+                        "publish_params": {
+                            "blocks_path": "/mnt/nvme0n1/Crypto/Nano/projects/nanolab-configs/resources/default_11n10pr_50k_4k_change/dowlnoads/10node_bucket_rounds.json",
+                            "bps": 1000,
+                            "start_round": 0,
+                            "end_round": 1,
+                            "subset": {
+                                "start_index": 25000,
+                                "end_index": 37500
+                            }
+                        }
+                    },
+                    "class": "NodeInteraction"
+                },
+                {
+                    "skip": false,
+                    "type": "python",
+                    "method": "publish_blocks",
+                    "variables": {
+                        "publish_params": {
+                            "blocks_path": "/mnt/nvme0n1/Crypto/Nano/projects/nanolab-configs/resources/default_11n10pr_50k_4k_change/dowlnoads/10node_bucket_rounds.json",
+                            "bps": 1000,
+                            "start_round": 0,
+                            "end_round": 1,
+                            "subset": {
+                                "start_index": 37500,
+                                "end_index": 50000
+                            }
+                        }
+                    },
+                    "class": "NodeInteraction"
+                }
+            ]
+        }
+    ]
+}

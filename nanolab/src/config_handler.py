@@ -17,7 +17,7 @@ class ConfigPathHandler:
         self.testcase_name = self._set_testcase_name(testcase_alias.strip())
         self.resources_dir = environ.get("NL_RES_DIR", "testcases")
         self.resources_path = self.base_path / self.resources_dir
-        self.downloads_path = self.base_path / self.resources_dir / "dowlnoads"
+        self.downloads_path = self.base_path / self.resources_dir / "downloads"
         self.config_copy_file_path = self.resources_path / \
             f"{self.testcase_name}_config.json"
         self.resolved_config_file_path = self.resources_path / "resolved_config.json"

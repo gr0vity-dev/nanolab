@@ -83,7 +83,7 @@ def get_blocks_from_disk(params: dict):
 class SocketPublish:
 
     def __init__(self, params: Dict[str, Any]):
-        self.bps = int(params["bps"])
+        self.bps = float(params["bps"])
         self.peers = params.get("peers")
         self.split = params.get("split", False)
         # skips 1st socket (genesis)
@@ -161,24 +161,51 @@ class SocketPublish:
 
         return messages, block_hashes
 
-    async def publish_message(self, socket: Dict[str, Any],
-                              messages: List[Any]) -> None:
+    async def publish_message(self, socket: Dict[str, Any], messages: List[Any]) -> None:
+        if self.bps <= 0:
+            raise ValueError("mps must be greater than 0")
+
         start_time = time.time()
+        # Calculate time interval between messages based on mps
+        message_interval = 1 / self.bps
         sent_messages = 0
+
         for idx, message in enumerate(messages):
             try:
+                # Send the message
                 socket['socket'].sendall(message.serialise())
                 sent_messages += 1
-                if sent_messages % self.bps == 0:
-                    end_time = time.time()
-                    elapsed_time = end_time - start_time
-                    remaining_time = max(1 - elapsed_time, 0)
-                    await asyncio.sleep(remaining_time)
-                    start_time = time.time()
+
+                # Calculate time to wait before sending the next message
+                end_time = time.time()
+                elapsed_time = end_time - start_time
+                remaining_time = max(message_interval - elapsed_time, 0)
+                await asyncio.sleep(remaining_time)
+
+                # Reset start time for the next message
+                start_time = time.time()
             except Exception as e:
                 print(
-                    f"Error sending message {idx+1} to {socket['peer']}: {str(e)}"
-                )
+                    f"Error sending message {idx+1} to {socket['peer']}: {str(e)}")
+
+    # async def publish_message(self, socket: Dict[str, Any],
+    #                           messages: List[Any]) -> None:
+    #     start_time = time.time()
+    #     sent_messages = 0
+    #     for idx, message in enumerate(messages):
+    #         try:
+    #             socket['socket'].sendall(message.serialise())
+    #             sent_messages += 1
+    #             if sent_messages % self.bps == 0:
+    #                 end_time = time.time()
+    #                 elapsed_time = end_time - start_time
+    #                 remaining_time = max(1 - elapsed_time, 0)
+    #                 await asyncio.sleep(remaining_time)
+    #                 start_time = time.time()
+    #         except Exception as e:
+    #             print(
+    #                 f"Error sending message {idx+1} to {socket['peer']}: {str(e)}"
+    #             )
 
     def create_publish_tasks(self, sockets: List[Dict[str, Any]],
                              messages: List[Any]) -> List[asyncio.Task]:

@@ -4,16 +4,14 @@ import base64
 
 class GitHubAPI:
 
-    def __init__(self, github_user, github_repo, testcase_path):
+    def __init__(self, github_user, github_repo, testcase_path, gh_ref = None):
         self.github_user = github_user
         self.github_repo = github_repo
+        self.gh_ref = "?ref=" + gh_ref if gh_ref else ""
+        self.testcase_path = testcase_path
 
-        # Extract ref from testcase_path and update it
-        self.testcase_path, self.gh_ref = self.extract_ref_from_path(
-            testcase_path)
-
-    def get_api_url(self, endpoint):
-        url = f"https://api.github.com/repos/{self.github_user}/{self.github_repo}/contents/{endpoint}{self.gh_ref}"
+    def get_api_url(self, endpoint, query="contents/"):
+        url = f"https://api.github.com/repos/{self.github_user}/{self.github_repo}/{query}{endpoint}{self.gh_ref}"
         print(url)
         return url
 
@@ -26,9 +24,28 @@ class GitHubAPI:
         else:
             # Return the original testcase_path and an empty string for gh_ref
             return testcase_path, ""
+    
+    def get_paths(self):
+        response = requests.get(self.get_api_url(""))
+        if response.status_code == 200:
+            contents = response.json()
+            return [item['path'] for item in contents]
+        else:
+            print(
+                "Error retrieving the repository branches. Please check the provided URL.")
+            return None
+        
+    def get_branches(self):
+        response = requests.get(self.get_api_url("", "branches"))
+        if response.status_code == 200:
+            contents = response.json()
+            return [item['name'] for item in contents]
+        else:
+            print(
+                "Error retrieving the repository branches. Please check the provided URL.")
+            return None    
 
     def get_files(self):
-
         response = requests.get(self.get_api_url(self.testcase_path))
         if response.status_code == 200:
             return response.json()

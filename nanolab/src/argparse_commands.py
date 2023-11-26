@@ -28,6 +28,8 @@ def parse_args():
                             help='GitHub repository (default: nanolab-configs)')
     run_parser.add_argument('--gh-path', type=str, default='default',
                             help='Path to testcases within the repository (default: default)')
+    run_parser.add_argument('--gh-ref',  type=str,
+                             help="Set github ref (equivalent to the branch)'")
 
     # List command
     list_parser = subparsers.add_parser("list", help="List testcases")
@@ -37,8 +39,15 @@ def parse_args():
                              help='GitHub repository (default: nanolab-configs)')
     list_parser.add_argument('--gh-path', type=str, default='default',
                              help='Path to testcases within the repository (default: default)')
+    list_parser.add_argument('--gh-ref',  type=str,
+                             help="Set github ref (equivalent to the branch)'")
     list_parser.add_argument('--local', action='store_true',
                              help="List testcases from local directory './testcases/'")
+    list_parser.add_argument('--paths', action='store_true',
+                             help="List all available paths'")
+    list_parser.add_argument('--refs', action='store_true',
+                             help="List all available branches'")
+    
 
     return parser.parse_args()
 
@@ -49,7 +58,7 @@ class ArgParseHandler:
         self.args = args or parse_args()
         self.conf_rw = ConfigReadWrite()
         self.github_api = GitHubAPI(self.args.gh_user, self.args.gh_repo,
-                                    self.args.gh_path)
+                                    self.args.gh_path,  self.args.gh_ref)
 
     def run(self):
         path_handler = ConfigPathHandler(self.args.testcase)
@@ -93,6 +102,18 @@ class ArgParseHandler:
                 if file.endswith('_config.json') and file != 'resolved_config.json':
                     # Prepend the path and remove the '.json' extension before printing
                     print(f"{base_path}/{file}")
+        elif self.args.paths:
+            # Otherwise, list test cases from the GitHub repository
+            branches = self.github_api.get_paths()
+            if branches:
+                for branch in branches:
+                    print(branch)
+        elif self.args.refs:
+            # Otherwise, list test cases from the GitHub repository
+            branches = self.github_api.get_branches()
+            if branches:
+                for branch in branches:
+                    print(branch)     
         else:
             # Otherwise, list test cases from the GitHub repository
             files = self.github_api.get_files()

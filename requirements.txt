@@ -1,16 +1,4 @@
 pytest
-nanomock>=0.0.10
-websocket-client
-bitmath
-# pyblake2==1.1.0
-# ed25519-blake2b
-# jsonpickle
-# requests
-# pydot==1.4.2
-# tomli-w
-# oyaml
-# nanolib
-# extradict
-# gmpy2
-# aiohttp
-#nano_local==0.1.5
+pytest-asyncio
+sqlalchemy
+nanomock>=0.0.15

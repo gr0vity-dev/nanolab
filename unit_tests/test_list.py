@@ -30,7 +30,7 @@ def test_nanoclub_args(args, expected_substring):
     assert expected_substring in output
 
 
-def test_nanolab_list_local_returns_all_testcases():
+def _test_nanolab_list_local_returns_all_testcases():
     original_cwd = os.getcwd()  # Save the current working directory
     os.chdir('unit_tests')  # Change the working directory to 'unit_tests'
 

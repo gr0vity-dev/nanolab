@@ -58,7 +58,7 @@ class RPCLogger(ILogger):
 
             # Loggers are cerated before the publishing starts.
             # Elapsed is started when the first blcok is received by the node
-            if percent_checked == 0:
+            if percent_checked == 0 and percent_cemented == 0:
                 start_time = time.time()
             elapsed_time = int(time.time() - start_time)
 

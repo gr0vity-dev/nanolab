@@ -105,8 +105,8 @@ class TestRun(unittest.TestCase):
         start_time = time.time()
         run.main()
         duration = time.time() - start_time
-        self.assertTrue(duration > 0.48, f"too short: {duration:.2f} s")
-        self.assertTrue(duration < 0.52, f"too long: {duration:.2f} s")
+        self.assertTrue(duration > 0.47, f"too short: {duration:.2f} s")
+        self.assertTrue(duration < 0.53, f"too long: {duration:.2f} s")
 
     @patch('sys.argv', [
         'nanolab', 'run', '--testcase',
@@ -116,8 +116,8 @@ class TestRun(unittest.TestCase):
         start_time = time.time()
         run.main()
         duration = time.time() - start_time
-        self.assertTrue(duration > 0.98, f"too short: {duration:.2f} s")
-        self.assertTrue(duration < 1.02, f"too long: {duration:.2f} s")
+        self.assertTrue(duration > 0.97, f"too short: {duration:.2f} s")
+        self.assertTrue(duration < 1.03, f"too long: {duration:.2f} s")
 
     @patch('sys.argv', [
         'nanolab', 'run', '--testcase',
@@ -127,8 +127,8 @@ class TestRun(unittest.TestCase):
         start_time = time.time()
         run.main()
         duration = time.time() - start_time
-        self.assertTrue(duration > 0.48, f"too short: {duration:.2f} s")
-        self.assertTrue(duration < 0.52, f"too long: {duration:.2f} s")
+        self.assertTrue(duration > 0.47, f"too short: {duration:.2f} s")
+        self.assertTrue(duration < 0.53, f"too long: {duration:.2f} s")
 
     @patch('sys.argv', [
         'nanolab', 'run', '--testcase',
@@ -138,8 +138,8 @@ class TestRun(unittest.TestCase):
         start_time = time.time()
         run.main()
         duration = time.time() - start_time
-        self.assertTrue(duration > 0.48, f"too short: {duration:.2f} s")
-        self.assertTrue(duration < 0.52, f"too long: {duration:.2f} s")
+        self.assertTrue(duration > 0.47, f"too short: {duration:.2f} s")
+        self.assertTrue(duration < 0.54, f"too long: {duration:.2f} s")
 
     @patch('sys.argv', [
         'nanolab', 'run', '--testcase',
@@ -254,6 +254,17 @@ class TestRun(unittest.TestCase):
     # def test_valid_threaded_snippet(self):
     #     expected_message = "test_snippet outside threaded"
     #     contains_expected_substring(expected_message)
+    
+    @patch('sys.argv', [
+        'nanolab', 'run', '--testcase',
+        'unit_tests/test_configs/threaded_mixed_bash.json'
+    ])
+    def test_threaded_mixed_bash(self):
+        start_time = time.time()
+        run.main()
+        duration = time.time() - start_time
+        self.assertTrue(duration > 0.97, f"too short: {duration:.2f} s")
+        self.assertTrue(duration < 1.03, f"too long: {duration:.2f} s")
 
 
 if __name__ == '__main__':

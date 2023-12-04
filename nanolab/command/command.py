@@ -36,9 +36,10 @@ class Command(ICommand):
         self.mixin.validate()
 
     def execute(self):
-        if self.command_config.get("skip"): return
+        if self.command_config.get("skip"):
+            return
         self.mixin.execute()
-    
+
     def create_command_instance(self, command_config):
         return Command(command_config)
 

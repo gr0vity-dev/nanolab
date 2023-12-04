@@ -8,20 +8,21 @@ import time
 
 class ThreadedCommandMixin(CommandMixinBase):
 
-    def validate(self):        
+    def validate(self):
         for command_config in self.command_instance.command_config["commands"]:
-            command = self.command_instance.create_command_instance(command_config)
+            command = self.command_instance.create_command_instance(
+                command_config)
             command.validate()
-    
+
     def execute(self):
-        normalized_commands = self._normalize_delays(self.command_instance.command_config["commands"])
+        normalized_commands = self._normalize_delays(
+            self.command_instance.command_config["commands"])
         schedule = self._build_schedule(normalized_commands)
         self._execute_commands(schedule)
-            
+
     def _execute_command_sequence(self, commands):
         for command_config in commands:
-            self.command_instance.execute_another_command(command_config)   
-
+            self.command_instance.execute_another_command(command_config)
 
     def _normalize_delays(self, commands):
         min_delay = min(cmd.get("delay", 0) for cmd in commands)
@@ -41,11 +42,13 @@ class ThreadedCommandMixin(CommandMixinBase):
                 command_groups[group].append(command_config)
             else:
                 delay = command_config.get("delay", 0)
-                _add_to_schedule(delay, self.command_instance.execute_another_command, (command_config,))
+                _add_to_schedule(
+                    delay, self.command_instance.execute_another_command, (command_config,))
 
         for group, command_configs in command_groups.items():
             delay = command_configs[0].get("delay", 0)
-            _add_to_schedule(delay, self._execute_command_sequence, (command_configs,))
+            _add_to_schedule(
+                delay, self._execute_command_sequence, (command_configs,))
 
         return schedule
 
@@ -61,5 +64,3 @@ class ThreadedCommandMixin(CommandMixinBase):
 
         for thread in threads:
             thread.join()
-
-   

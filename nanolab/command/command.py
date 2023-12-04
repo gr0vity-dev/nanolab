@@ -38,8 +38,11 @@ class Command(ICommand):
     def execute(self):
         if self.command_config.get("skip"): return
         self.mixin.execute()
+    
+    def create_command_instance(self, command_config):
+        return Command(command_config)
 
     def execute_another_command(self, command_config):
-        another_command = Command(command_config)
+        another_command = self.create_command_instance(command_config)
         another_command.validate()
         another_command.execute()

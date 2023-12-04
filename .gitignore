@@ -1,6 +1,7 @@
 _manage/**
 .vscode/
 build/
+dist/
 resources/
 **egg-info**
 nano_nodes/

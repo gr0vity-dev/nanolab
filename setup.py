@@ -4,7 +4,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setup(name="nanolab",
-      version="0.0.17",
+      version="0.0.18",
       author="gr0vity",
       description="testing tool using nanomock",
       long_description=long_description,

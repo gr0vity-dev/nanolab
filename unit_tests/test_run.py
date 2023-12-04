@@ -105,8 +105,8 @@ class TestRun(unittest.TestCase):
         start_time = time.time()
         run.main()
         duration = time.time() - start_time
-        self.assertTrue(duration > 0.47, f"too short: {duration:.2f} s")
-        self.assertTrue(duration < 0.53, f"too long: {duration:.2f} s")
+        self.assertTrue(duration >= 0.47, f"too short: {duration:.2f} s")
+        self.assertTrue(duration <= 0.53, f"too long: {duration:.2f} s")
 
     @patch('sys.argv', [
         'nanolab', 'run', '--testcase',
@@ -116,8 +116,8 @@ class TestRun(unittest.TestCase):
         start_time = time.time()
         run.main()
         duration = time.time() - start_time
-        self.assertTrue(duration > 0.97, f"too short: {duration:.2f} s")
-        self.assertTrue(duration < 1.03, f"too long: {duration:.2f} s")
+        self.assertTrue(duration >= 0.97, f"too short: {duration:.2f} s")
+        self.assertTrue(duration <= 1.03, f"too long: {duration:.2f} s")
 
     @patch('sys.argv', [
         'nanolab', 'run', '--testcase',
@@ -127,8 +127,8 @@ class TestRun(unittest.TestCase):
         start_time = time.time()
         run.main()
         duration = time.time() - start_time
-        self.assertTrue(duration > 0.47, f"too short: {duration:.2f} s")
-        self.assertTrue(duration < 0.53, f"too long: {duration:.2f} s")
+        self.assertTrue(duration >= 0.47, f"too short: {duration:.2f} s")
+        self.assertTrue(duration <= 0.53, f"too long: {duration:.2f} s")
 
     @patch('sys.argv', [
         'nanolab', 'run', '--testcase',
@@ -138,8 +138,8 @@ class TestRun(unittest.TestCase):
         start_time = time.time()
         run.main()
         duration = time.time() - start_time
-        self.assertTrue(duration > 0.47, f"too short: {duration:.2f} s")
-        self.assertTrue(duration < 0.54, f"too long: {duration:.2f} s")
+        self.assertTrue(duration >= 0.47, f"too short: {duration:.2f} s")
+        self.assertTrue(duration <= 0.54, f"too long: {duration:.2f} s")
 
     @patch('sys.argv', [
         'nanolab', 'run', '--testcase',
@@ -263,8 +263,50 @@ class TestRun(unittest.TestCase):
         start_time = time.time()
         run.main()
         duration = time.time() - start_time
-        self.assertTrue(duration > 0.97, f"too short: {duration:.2f} s")
-        self.assertTrue(duration < 1.03, f"too long: {duration:.2f} s")
+        self.assertTrue(duration >= 0.97, f"too short: {duration:.2f} s")
+        self.assertTrue(duration <= 1.03, f"too long: {duration:.2f} s")
+
+    @patch('sys.argv', [
+        'nanolab', 'run', '--testcase',
+        'unit_tests/test_configs/bash_background.json'
+    ])
+    def test_bash_background(self):
+        start_time = time.time()
+        run.main()
+        duration = time.time() - start_time
+        self.assertTrue(duration >= 0.97, f"too short: {duration:.2f} s")
+        self.assertTrue(duration <= 1.03, f"too long: {duration:.2f} s")
+
+    @patch('sys.argv', [
+        'nanolab', 'run', '--testcase',
+        'unit_tests/test_configs/bash_skip.json'
+    ])
+    def test_bash_skip(self):
+        start_time = time.time()
+        run.main()
+        duration = time.time() - start_time
+        self.assertTrue(duration <= 0.1, f"too long: {duration:.2f} s")
+    
+    @patch('sys.argv', [
+        'nanolab', 'run', '--testcase',
+        'unit_tests/test_configs/bash_skip_false.json'
+    ])
+    def test_bash_skip_false(self):
+        start_time = time.time()
+        run.main()
+        duration = time.time() - start_time
+        self.assertTrue(duration >= 0.17, f"too short: {duration:.2f} s")
+        self.assertTrue(duration <= 0.23, f"too long: {duration:.2f} s")
+    
+    @patch('sys.argv', [
+        'nanolab', 'run', '--testcase',
+        'unit_tests/test_configs/bash_background_pid.json'
+    ])
+    def test_bash_background_pid(self):
+        run.main()
+        self.assertTrue(os.path.exists('unit_tests/pid.out'), "pid.out file does not exist")
+        if os.path.exists('unit_tests/pid.out'):
+            os.remove('unit_tests/pid.out')
 
 
 if __name__ == '__main__':

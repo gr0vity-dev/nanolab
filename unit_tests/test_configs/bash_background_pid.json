@@ -1,0 +1,12 @@
+{
+    "testcase" : "docker_tags",
+    "docker_tags" : ["nanocurrency/nano:V24.0"],
+    "commands": [  
+        {
+            "type": "bash",            
+            "command":  "sleep 1",
+            "background" : true,
+            "pid" : "unit_tests/pid.out"
+        }       
+    ]
+}

@@ -1,4 +1,5 @@
 import os
+import subprocess
 from nanomock.modules.nl_parse_config import ConfigReadWrite
 from .snippet_manager import SnippetManager
 from nanolab.command.command import Command
@@ -148,11 +149,23 @@ class ConfigValidator:
 class ConfigCommandExecutor:
 
     @staticmethod
+    def pull_docker_tag(tag):
+        try:
+            subprocess.run(['docker', 'pull', tag], check=True)
+            return True
+        except subprocess.CalledProcessError:
+            return False
+
+    @staticmethod
     def execute_commands(config):
         for docker_tag in config["docker_tags"]:
-            os.environ["docker_tag"] = docker_tag
-            for command_config in config["commands"]:
-                ConfigCommandExecutor.execute_command(command_config)
+            if ConfigCommandExecutor.pull_docker_tag(docker_tag):
+                os.environ["docker_tag"] = docker_tag
+                for command_config in config["commands"]:
+                    ConfigCommandExecutor.execute_command(command_config)
+            else:
+                print(
+                    f"Error: Unable to pull Docker tag '{docker_tag}'. Skipping commands for this tag.")
 
     @staticmethod
     def execute_command(command_config):

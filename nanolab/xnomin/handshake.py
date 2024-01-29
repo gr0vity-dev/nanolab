@@ -1,4 +1,4 @@
-from nanolab.xnomin.peers import message_header, ed25519_blake2b, socket, hexlify, message_type
+from nanolab.xnomin.peers import message_header, py_ed25519_blake2b, socket, hexlify, message_type
 from secrets import token_bytes
 from typing import Tuple
 
@@ -36,14 +36,14 @@ class node_handshake_id:
     @classmethod
     def keypair(
         cls
-    ) -> Tuple[ed25519_blake2b.SigningKey, ed25519_blake2b.VerifyingKey]:
-        return ed25519_blake2b.create_keypair()
+    ) -> Tuple[py_ed25519_blake2b.SigningKey, py_ed25519_blake2b.VerifyingKey]:
+        return py_ed25519_blake2b.create_keypair()
 
     @classmethod
     def perform_handshake_exchange(
             cls, ctx: dict, s: socket.socket,
-            signing_key: ed25519_blake2b.SigningKey,
-            verifying_key: ed25519_blake2b.VerifyingKey) -> bytes:
+            signing_key: py_ed25519_blake2b.SigningKey,
+            verifying_key: py_ed25519_blake2b.VerifyingKey) -> bytes:
         hdr = message_header(ctx['net_id'], [18, 18, 18], message_type(10), 1)
         msg_handshake = handshake_query(hdr)
         s.sendall(msg_handshake.serialise())
@@ -57,7 +57,7 @@ class node_handshake_id:
                 ctx, recvd_response.cookie, signing_key, verifying_key)
             s.sendall(response.serialise())
 
-            # vk = ed25519_blake2b.keys.VerifyingKey(recvd_response.account)
+            # vk = py_ed25519_blake2b.keys.VerifyingKey(recvd_response.account)
             # vk.verify(recvd_response.sig, msg_handshake.cookie)
         except TypeError:
             raise ValueError("HandshakeExchangeFail")
@@ -100,8 +100,8 @@ class handshake_response_query(node_handshake_id):
 
     @classmethod
     def create_response(cls, ctx, cookie,
-                        signing_key: ed25519_blake2b.SigningKey,
-                        verifying_key: ed25519_blake2b.VerifyingKey):
+                        signing_key: py_ed25519_blake2b.SigningKey,
+                        verifying_key: py_ed25519_blake2b.VerifyingKey):
         my_cookie = token_bytes(32)
         sig = signing_key.sign(cookie)
         hdr = message_header(ctx['net_id'], [18, 18, 18], message_type(10), 3)
@@ -185,8 +185,8 @@ class handshake_response(node_handshake_id):
 
     @classmethod
     def create_response(cls, ctx, cookie,
-                        signing_key: ed25519_blake2b.SigningKey,
-                        verifying_key: ed25519_blake2b.VerifyingKey):
+                        signing_key: py_ed25519_blake2b.SigningKey,
+                        verifying_key: py_ed25519_blake2b.VerifyingKey):
         sig = signing_key.sign(cookie)
         hdr = message_header(ctx['net_id'], [18, 18, 18], message_type(10), 2)
         return handshake_response(hdr, verifying_key.to_bytes(), sig)

@@ -5,7 +5,7 @@ import ipaddress
 import logging
 import binascii
 from hashlib import blake2b
-import ed25519_blake2b
+import py_ed25519_blake2b
 import json
 import requests
 from nanolab.xnomin.acctools import to_account_addr, account_key
@@ -52,7 +52,8 @@ logger = get_logger()
 
 
 def hexlify(data) -> str:
-    if data is None: return 'None'
+    if data is None:
+        return 'None'
     return binascii.hexlify(data).decode("utf-8").upper()
 
 
@@ -356,7 +357,7 @@ class block_state:
             return True
         return False
 
-    def sign(self, signing_key: ed25519_blake2b.keys.SigningKey) -> None:
+    def sign(self, signing_key: py_ed25519_blake2b.keys.SigningKey) -> None:
         self.signature = signing_key.sign(self.hash())
 
     def generate_work(self, min_difficulty: int) -> None:
@@ -467,8 +468,8 @@ class block_state:
 class ip_addr:
 
     def __init__(
-        self,
-        ipv6: Union[str, ipaddress.IPv6Address] = ipaddress.IPv6Address(0)):
+            self,
+            ipv6: Union[str, ipaddress.IPv6Address] = ipaddress.IPv6Address(0)):
         if isinstance(ipv6, str):
             self.ipv6 = ipaddress.IPv6Address(ipv6)
         else:
@@ -562,8 +563,7 @@ class Peer:
         from nanolab.xnomin.telemetry_req import telemetry_ack
         # Add 'incoming' argument when peer service code gets updated
         peer = Peer(ip_addr(json_peer['ip']), json_peer['port'],
-                    json_peer['score'], json_peer['is_voting'])  #,
-        #json_peer['last_seen'])
+                    json_peer['score'], json_peer['is_voting'])
         if 'telemetry' in json_peer and json_peer['telemetry'] is not None:
             peer.telemetry = telemetry_ack.from_json(json_peer['telemetry'])
         if 'peer_id' in json_peer and json_peer['peer_id']:

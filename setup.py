@@ -13,7 +13,7 @@ setup(name="nanolab",
       packages=find_packages(exclude=["unit_tests"]),
       include_package_data=True,
       install_requires=["nanomock>=0.0.14",
-                        "sqlalchemy", "aiohttp", "nanolog_parser"],
+                        "py_ed25519_blake2b", "sqlalchemy", "aiohttp", "nanolog_parser"],
       entry_points={
           'console_scripts': [
               'nanolab=nanolab.main:main',

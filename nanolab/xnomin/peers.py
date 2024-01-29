@@ -536,28 +536,6 @@ class Peer:
     def deduct_score(self, score: int) -> None:
         self.score = max(0, self.score - score)
 
-    def merge(self, peer: "Peer") -> None:
-        assert self == peer
-
-        self.last_seen = peer.last_seen
-
-        if peer.telemetry is not None:
-            self.telemetry = peer.telemetry
-        if peer.incoming is False:
-            self.port = peer.port
-            self.incoming = False
-        if peer.is_voting is True:
-            self.is_voting = True
-
-        logger.log(VERBOSE, f"Merged peer {peer}")
-
-    @classmethod
-    def parse_peer(cls, data: bytes):
-        assert (len(data) == 18)
-        ip = parse_ipv6(data[0:16])
-        port = int.from_bytes(data[16:], "little")
-        return Peer(ip_addr(ip), port)
-
     @classmethod
     def from_json(self, json_peer):
         from nanolab.xnomin.telemetry_req import telemetry_ack

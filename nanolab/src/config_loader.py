@@ -149,7 +149,16 @@ class ConfigValidator:
 class ConfigCommandExecutor:
 
     @staticmethod
+    def docker_tag_exists(tag):
+        result = subprocess.run(['docker', 'image', 'inspect', tag],
+                                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        return result.returncode == 0
+
+    @staticmethod
     def pull_docker_tag(tag):
+        if ConfigCommandExecutor.docker_tag_exists(tag):
+            print(f"Docker tag '{tag}' already exists locally.")
+            return True
         try:
             subprocess.run(['docker', 'pull', tag], check=True)
             return True

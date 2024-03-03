@@ -1,6 +1,6 @@
 {
     "testcase" : "docker_tags",
-    "docker_tags" : ["tag1", "nanocurrency/nano:V24.0"],
+    "docker_tags" : ["alpine", "nanocurrency/nano:V24.0"],
     "commands": [
         {
             "type": "bash",

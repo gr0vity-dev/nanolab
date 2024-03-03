@@ -1,6 +1,6 @@
 {
     "testcase" : "invalid_method",
-    "docker_tags" : ["tag1"],
+    "docker_tags" : ["alpine"],
     "commands": [
         {
             "type": "python",

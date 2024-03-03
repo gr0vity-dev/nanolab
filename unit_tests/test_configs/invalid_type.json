@@ -1,6 +1,6 @@
 {
     "testcase" : "invalid_type",
-    "docker_tags" : ["tag1"],
+    "docker_tags" : ["alpine"],
     "commands": [
         {
             "type": "invalid",

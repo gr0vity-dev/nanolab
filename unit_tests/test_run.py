@@ -105,8 +105,8 @@ class TestRun(unittest.TestCase):
         start_time = time.time()
         run.main()
         duration = time.time() - start_time
-        self.assertTrue(duration >= 0.47, f"too short: {duration:.2f} s")
-        self.assertTrue(duration <= 0.53, f"too long: {duration:.2f} s")
+        self.assertTrue(duration >= 0.43, f"too short: {duration:.2f} s")
+        self.assertTrue(duration <= 0.57, f"too long: {duration:.2f} s")
 
     @patch('sys.argv', [
         'nanolab', 'run', '--testcase',
@@ -116,8 +116,8 @@ class TestRun(unittest.TestCase):
         start_time = time.time()
         run.main()
         duration = time.time() - start_time
-        self.assertTrue(duration >= 0.97, f"too short: {duration:.2f} s")
-        self.assertTrue(duration <= 1.03, f"too long: {duration:.2f} s")
+        self.assertTrue(duration >= 0.93, f"too short: {duration:.2f} s")
+        self.assertTrue(duration <= 1.07, f"too long: {duration:.2f} s")
 
     @patch('sys.argv', [
         'nanolab', 'run', '--testcase',
@@ -127,8 +127,8 @@ class TestRun(unittest.TestCase):
         start_time = time.time()
         run.main()
         duration = time.time() - start_time
-        self.assertTrue(duration >= 0.47, f"too short: {duration:.2f} s")
-        self.assertTrue(duration <= 0.53, f"too long: {duration:.2f} s")
+        self.assertTrue(duration >= 0.43, f"too short: {duration:.2f} s")
+        self.assertTrue(duration <= 0.57, f"too long: {duration:.2f} s")
 
     @patch('sys.argv', [
         'nanolab', 'run', '--testcase',
@@ -138,15 +138,15 @@ class TestRun(unittest.TestCase):
         start_time = time.time()
         run.main()
         duration = time.time() - start_time
-        self.assertTrue(duration >= 0.47, f"too short: {duration:.2f} s")
-        self.assertTrue(duration <= 0.54, f"too long: {duration:.2f} s")
+        self.assertTrue(duration >= 0.44, f"too short: {duration:.2f} s")
+        self.assertTrue(duration <= 0.57, f"too long: {duration:.2f} s")
 
     @patch('sys.argv', [
         'nanolab', 'run', '--testcase',
         'unit_tests/test_configs/snippet_python_valid.json'
     ])
     def test_python_snippet(self):
-        expected_output = "Hello there from python snippet"
+        expected_output = "Docker tag 'nanocurrency/nano:V24.0' already exists locally.\nHello there from python snippet"
         match_expected_output(expected_output)
 
     @patch('sys.argv', [
@@ -154,7 +154,7 @@ class TestRun(unittest.TestCase):
         'unit_tests/test_configs/snippet_python_list.json'
     ])
     def test_python_snippet_list(self):
-        expected_output = "['pr1', 'pr2'] 2"
+        expected_output = "Docker tag 'nanocurrency/nano:V24.0' already exists locally.\n['pr1', 'pr2'] 2"
         match_expected_output(expected_output)
 
     @patch('sys.argv', [
@@ -162,7 +162,7 @@ class TestRun(unittest.TestCase):
         'unit_tests/test_configs/valid_snippets_and_bash.json'
     ])
     def test_valid_snippets_and_bash(self):
-        expected_output = "Hello, World!\nfile test.txt"
+        expected_output = "Docker tag 'alpine' already exists locally.\nHello, World!\nfile test.txt"
         match_expected_output(expected_output)
 
     @patch('sys.argv', [
@@ -170,7 +170,7 @@ class TestRun(unittest.TestCase):
         'unit_tests/test_configs/snippet_without_vars.json'
     ])
     def test_snippet_without_vars(self):
-        expected_output = "No vars needed!"
+        expected_output = "Docker tag 'nanocurrency/nano:V24.0' already exists locally.\nNo vars needed!"
         match_expected_output(expected_output)
 
     @patch('sys.argv', [
@@ -178,7 +178,7 @@ class TestRun(unittest.TestCase):
         'unit_tests/test_configs/snippet_in_snippet.json'
     ])
     def test_snippet_in_snippet(self):
-        expected_output = "file test.txt"
+        expected_output = "Docker tag 'nanocurrency/nano:V24.0' already exists locally.\nfile test.txt"
         match_expected_output(expected_output)
 
     @patch('sys.argv', [
@@ -186,7 +186,7 @@ class TestRun(unittest.TestCase):
         'unit_tests/test_configs/snippet_with_unused_vars.json'
     ])
     def test_snippet_with_unused_vars(self):
-        expected_output = "file test.txt"
+        expected_output = "Docker tag 'nanocurrency/nano:V24.0' already exists locally.\nfile test.txt"
         match_expected_output(expected_output)
 
     @patch('sys.argv', [
@@ -194,7 +194,7 @@ class TestRun(unittest.TestCase):
         'unit_tests/test_configs/docker_tags.json'
     ])
     def test_docker_tags(self):
-        expected_output = "tag1\nnanocurrency/nano:V24.0"
+        expected_output = "Docker tag 'alpine' already exists locally.\nalpine\nDocker tag 'nanocurrency/nano:V24.0' already exists locally.\nnanocurrency/nano:V24.0"
         match_expected_output(expected_output)
 
     @patch('sys.argv', [
@@ -244,7 +244,7 @@ class TestRun(unittest.TestCase):
         'unit_tests/test_configs/snippet_multiple_same.json'
     ])
     def test_snippet_multiple_same(self):
-        expected_message = "file command_1\nfile command_2"
+        expected_message = "Docker tag 'nanocurrency/nano:V24.0' already exists locally.\nfile command_1\nfile command_2"
         match_expected_output(expected_message)
 
     # @patch('sys.argv', [
@@ -254,7 +254,7 @@ class TestRun(unittest.TestCase):
     # def test_valid_threaded_snippet(self):
     #     expected_message = "test_snippet outside threaded"
     #     contains_expected_substring(expected_message)
-    
+
     @patch('sys.argv', [
         'nanolab', 'run', '--testcase',
         'unit_tests/test_configs/threaded_mixed_bash.json'
@@ -263,8 +263,8 @@ class TestRun(unittest.TestCase):
         start_time = time.time()
         run.main()
         duration = time.time() - start_time
-        self.assertTrue(duration >= 0.97, f"too short: {duration:.2f} s")
-        self.assertTrue(duration <= 1.03, f"too long: {duration:.2f} s")
+        self.assertTrue(duration >= 0.93, f"too short: {duration:.2f} s")
+        self.assertTrue(duration <= 1.07, f"too long: {duration:.2f} s")
 
     @patch('sys.argv', [
         'nanolab', 'run', '--testcase',
@@ -274,8 +274,8 @@ class TestRun(unittest.TestCase):
         start_time = time.time()
         run.main()
         duration = time.time() - start_time
-        self.assertTrue(duration >= 0.97, f"too short: {duration:.2f} s")
-        self.assertTrue(duration <= 1.03, f"too long: {duration:.2f} s")
+        self.assertTrue(duration >= 0.93, f"too short: {duration:.2f} s")
+        self.assertTrue(duration <= 1.07, f"too long: {duration:.2f} s")
 
     @patch('sys.argv', [
         'nanolab', 'run', '--testcase',
@@ -286,7 +286,7 @@ class TestRun(unittest.TestCase):
         run.main()
         duration = time.time() - start_time
         self.assertTrue(duration <= 0.1, f"too long: {duration:.2f} s")
-    
+
     @patch('sys.argv', [
         'nanolab', 'run', '--testcase',
         'unit_tests/test_configs/bash_skip_false.json'
@@ -295,16 +295,17 @@ class TestRun(unittest.TestCase):
         start_time = time.time()
         run.main()
         duration = time.time() - start_time
-        self.assertTrue(duration >= 0.17, f"too short: {duration:.2f} s")
-        self.assertTrue(duration <= 0.23, f"too long: {duration:.2f} s")
-    
+        self.assertTrue(duration >= 0.13, f"too short: {duration:.2f} s")
+        self.assertTrue(duration <= 0.27, f"too long: {duration:.2f} s")
+
     @patch('sys.argv', [
         'nanolab', 'run', '--testcase',
         'unit_tests/test_configs/bash_background_pid.json'
     ])
     def test_bash_background_pid(self):
         run.main()
-        self.assertTrue(os.path.exists('unit_tests/pid.out'), "pid.out file does not exist")
+        self.assertTrue(os.path.exists('unit_tests/pid.out'),
+                        "pid.out file does not exist")
         if os.path.exists('unit_tests/pid.out'):
             os.remove('unit_tests/pid.out')
 

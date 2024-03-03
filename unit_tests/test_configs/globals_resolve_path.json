@@ -1,6 +1,6 @@
 {
     "testcase" : "globals_resolve_path",
-    "docker_tags" : ["tag1"],
+    "docker_tags" : ["alpine"],
     "global": {
         "PATH_TO_THIS_FILE": "unit_tests/test_configs/globals_resolve_path.json"
     },

@@ -1,7 +1,7 @@
 {
     "testcase": "threaded_delay_negative",
     "docker_tags": [
-        "tag1"
+        "alpine"
     ],
     "commands": [
         {

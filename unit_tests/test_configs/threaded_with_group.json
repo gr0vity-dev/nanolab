@@ -1,7 +1,7 @@
 {
     "testcase": "threaded_with_group",
     "docker_tags": [
-        "tag1"
+        "alpine"
     ],
     "commands": [
         {

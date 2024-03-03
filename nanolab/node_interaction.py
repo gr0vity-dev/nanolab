@@ -163,12 +163,14 @@ class SocketPublish:
 
     async def publish_message(self, socket: Dict[str, Any], messages: List[Any]) -> None:
         if self.bps <= 0:
-            raise ValueError("mps must be greater than 0")
+            raise ValueError("bps must be greater than 0")
 
         start_time = time.time()
-        # Calculate time interval between messages based on mps
+        # Calculate time interval between messages based on bps
         message_interval = 1 / self.bps
         sent_messages = 0
+        # accumulated_time is required because asyncio.sleep(accumulated_time) accepts time in miliseconds only
+        accumulated_time = 0
 
         for idx, message in enumerate(messages):
             try:
@@ -180,7 +182,12 @@ class SocketPublish:
                 end_time = time.time()
                 elapsed_time = end_time - start_time
                 remaining_time = max(message_interval - elapsed_time, 0)
-                await asyncio.sleep(remaining_time)
+                accumulated_time += remaining_time
+
+                # If accumulated_time reaches or exceeds 1 millisecond, sleep for accumulated_time and reset it
+                if accumulated_time >= 0.001:
+                    await asyncio.sleep(accumulated_time)
+                    accumulated_time = 0  # Reset after sleeping
 
                 # Reset start time for the next message
                 start_time = time.time()

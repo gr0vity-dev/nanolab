@@ -4,6 +4,7 @@ from .base_mixin import CommandMixinBase
 from collections import defaultdict
 import heapq
 import time
+import copy
 
 
 class ThreadedCommandMixin(CommandMixinBase):
@@ -36,14 +37,29 @@ class ThreadedCommandMixin(CommandMixinBase):
             run_at = time.time() + delay
             heapq.heappush(schedule, (run_at, target, args))
 
+        def _append_replicas(command_config):
+            # Extract and remove the replication count from the command_config
+            replica_count = int(command_config.pop('replicas', 1))
+            for _ in range(replica_count):
+                # Make a deep copy to ensure each command is a separate object
+                replicated_command = copy.deepcopy(command_config)
+                delay = replicated_command.get("delay", 0)
+                _add_to_schedule(
+                    delay, self.command_instance.execute_another_command, (replicated_command,))
+
         for command_config in commands:
             group = command_config.get("group")
             if group:
+                # If the command is part of a group, append it to the respective group list
                 command_groups[group].append(command_config)
             else:
-                delay = command_config.get("delay", 0)
-                _add_to_schedule(
-                    delay, self.command_instance.execute_another_command, (command_config,))
+                # Check if this command should be independently replicated
+                if "replicas" in command_config:
+                    _append_replicas(command_config)
+                else:
+                    delay = command_config.get("delay", 0)
+                    _add_to_schedule(
+                        delay, self.command_instance.execute_another_command, (command_config,))
 
         for group, command_configs in command_groups.items():
             delay = command_configs[0].get("delay", 0)

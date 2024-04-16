@@ -1,4 +1,4 @@
 pytest
 pytest-asyncio
 sqlalchemy
-nanomock>=0.0.15
+nanomock>=0.0.16

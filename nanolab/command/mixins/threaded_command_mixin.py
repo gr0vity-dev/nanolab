@@ -35,6 +35,7 @@ class ThreadedCommandMixin(CommandMixinBase):
 
         def _add_to_schedule(delay, target, args):
             run_at = time.time() + delay
+            time.sleep(0.01)
             heapq.heappush(schedule, (run_at, target, args))
 
         def _append_replicas(command_config):

@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from nanolab.src.nano_rpc import NanoRpcV2
 from nanolab.publisher.block_asserts import BlockAsserts
 from nanolab.publisher.block_generator import BlockGenerator
 from nanolab.publisher.confirmation_stats import ConfirmationStatsManager

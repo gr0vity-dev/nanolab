@@ -14,3 +14,6 @@ venv_py/
 **/._.DS_Store
 debug
 unit_tests/testcases
+snippets/
+testcases/
+nl_config.toml

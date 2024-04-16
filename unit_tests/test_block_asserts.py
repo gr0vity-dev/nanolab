@@ -10,7 +10,7 @@ import time
 
 @pytest.fixture
 def mock_rpc():
-    with patch('nanolab.src.nano_rpc.NanoRpcV2') as mock:
+    with patch('nanorpc.client.NanoRpcTyped') as mock:
         yield mock
 
 

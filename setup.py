@@ -4,7 +4,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setup(name="nanolab",
-      version="0.0.21",
+      version="0.0.22",
       author="gr0vity",
       description="testing tool using nanomock",
       long_description=long_description,
@@ -13,7 +13,7 @@ setup(name="nanolab",
       packages=find_packages(exclude=["unit_tests"]),
       include_package_data=True,
       install_requires=["nanomock>=0.0.14",
-                        "py_ed25519_blake2b", "sqlalchemy", "aiohttp", "nanolog_parser"],
+                        "py_ed25519_blake2b", "sqlalchemy", "requests", "aiohttp", "nanolog_parser"],
       entry_points={
           'console_scripts': [
               'nanolab=nanolab.main:main',

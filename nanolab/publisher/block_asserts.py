@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from nanolab.src.nano_rpc import NanoRpcV2
+from nanorpc.client import NanoRpcTyped
 from nanolab.publisher.block_event import BlockConfirmationEvent
 from nanolab.src.utils import get_config_parser
 import asyncio
@@ -44,8 +44,9 @@ class BlockAsserts(IBlockAsserts):
         self.event_bus = event_bus
         conf_p = get_config_parser()
         node_name = node_name if node_name else conf_p.get_nodes_name()[:-1]
-        self.nano_rpc_default = NanoRpcV2(conf_p.get_node_rpc(node_name))
-        self.nano_rpc_all = [NanoRpcV2(url) for url in conf_p.get_nodes_rpc()]
+        self.nano_rpc_default = NanoRpcTyped(conf_p.get_node_rpc(node_name))
+        self.nano_rpc_all = [NanoRpcTyped(url)
+                             for url in conf_p.get_nodes_rpc()]
 
     async def _fetch_block_info(self, block_hash):
         return await self.nano_rpc_default.block_info(block_hash,
@@ -101,7 +102,8 @@ class BlockAsserts(IBlockAsserts):
 
     async def _publish_block_confirmation_event(self, wait_s, block_hash,
                                                 timeout):
-        if not self.event_bus: return
+        if not self.event_bus:
+            return
         event = BlockConfirmationEvent(block_hash, timeout, wait_s)
         await self.event_bus.publish('block_confirmed', event)
 

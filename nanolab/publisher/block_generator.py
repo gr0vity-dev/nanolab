@@ -1,4 +1,3 @@
-#from nanolab.src.nano_rpc_v2 import NanoRpcV2
 from nanomock.modules.nl_rpc import NanoRpc, NanoLibTools
 from nanolab.src.utils import get_config_parser
 from abc import ABC, abstractmethod
@@ -67,7 +66,7 @@ class BlockGenerator(IBlockGenerator):
     def create_send_and_open_block(self, send_amount_raw, source_seed,
                                    source_index, destination_seed,
                                    destination_index, representative):
-        #destination = self.nano_rpc_default.generate_account(destination_seed, destination_index)
+        # destination = self.nano_rpc_default.generate_account(destination_seed, destination_index)
         return self.blockgen_single_account_opener(
             representative=representative,
             source_seed=source_seed,

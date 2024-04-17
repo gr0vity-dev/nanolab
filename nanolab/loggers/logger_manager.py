@@ -19,8 +19,8 @@ class LoggingManager:
         self.sink_params_list = sink_params
 
     async def create_logger_and_storages(self, current_logger_params):
-        logger = LoggerFactory.create_logger(self.logger_type,
-                                             current_logger_params)
+        logger = await LoggerFactory.create_logger(self.logger_type,
+                                                   current_logger_params)
 
         storages = []
         for sink_params in self.sink_params_list:
@@ -33,7 +33,7 @@ class LoggingManager:
     async def create_loggers(self):
         for node in self.nodes_config:
             if (self.included_peers and node["name"] not in self.included_peers
-                ) or node["name"] in self.excluded_peers:
+                    ) or node["name"] in self.excluded_peers:
                 continue
             current_params = dict(self.logger_params)
             current_params["node_name"] = node["name"]

@@ -12,7 +12,7 @@ class LoggerBuilder(ABC):
         return self
 
     @abstractmethod
-    def build(self):
+    async def build(self):
         pass
 
 
@@ -36,11 +36,13 @@ class RPCLoggerBuilder(LoggerBuilder):
         self.node_name = node_name
         return self
 
-    def build(self):
-        if self.rpc_url is None or self.expected_blocks_count is None or self.node_name is None:
+    async def build(self):
+        if any(param is None for param in [self.rpc_url, self.expected_blocks_count, self.node_name, self.timeout]):
             raise Exception("Missing required parameters")
-        return RPCLogger(self.node_name, self.rpc_url,
-                         self.expected_blocks_count, self.timeout)
+        logger = RPCLogger(self.node_name, self.rpc_url,
+                           self.expected_blocks_count, self.timeout)
+        await logger.async_init()
+        return logger
 
 
 # class WebSocketLoggerBuilder(LoggerBuilder):

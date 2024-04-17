@@ -35,23 +35,25 @@ def mock_fully_cemented():
         yield mock_fully_cemented
 
 
-def test_get_block_count(mock_version, mock_block_count):
+@pytest.mark.asyncio
+async def test_get_block_count(mock_version, mock_block_count):
     logger = RPCLogger(node_name="test_node",
                        rpc_url="http://test_url",
                        expected_blocks_count=99,
                        timeout=10)
-    count, cemented = logger._get_block_count()
+    count, cemented = await logger._get_block_count()
     assert count == 100
     assert cemented == 50
 
 
-def test_is_fully_synced(mock_version, mock_fully_cemented):
+@pytest.mark.asyncio
+async def test_is_fully_synced(mock_version, mock_fully_cemented):
     logger = RPCLogger(node_name="test_node",
                        rpc_url="http://test_url",
                        expected_blocks_count=99,
-                       count_start=1,
-                       cemented_start=1,
                        timeout=10)
+    await logger.async_init(count_start=1, cemented_start=1)
+
     is_synced = logger.is_fully_synced(cemented=100)
     assert is_synced
     is_synced = logger.is_fully_synced(cemented=40)
@@ -63,9 +65,9 @@ async def test_fetch_logs(mock_version, mock_fully_cemented):
     logger = RPCLogger(node_name="test_node",
                        rpc_url="http://test_url",
                        expected_blocks_count=99,
-                       count_start=1,
-                       cemented_start=1,
                        timeout=0.5)
+    await logger.async_init(count_start=1, cemented_start=1)
+
     logs = []
     async for log in logger.fetch_logs():
         logs.append(log)
@@ -79,6 +81,7 @@ async def test_fetch_logs_timeout(mock_version, mock_fully_cemented):
                        rpc_url="http://test_url",
                        expected_blocks_count=500000,
                        timeout=1)
+    await logger.async_init(count_start=1, cemented_start=1)
     logs = []
     async for log in logger.fetch_logs():
         logs.append(log)
@@ -87,13 +90,13 @@ async def test_fetch_logs_timeout(mock_version, mock_fully_cemented):
     assert logs[0].elapsed_time == 0
 
 
-def test_case_with_different_version(mock_fully_cemented):
+@pytest.mark.asyncio
+async def test_case_with_different_version(mock_fully_cemented):
     with patch('nanomock.modules.nl_rpc.NanoRpc.version',
                return_value=None) as mock_version:
         logger = RPCLogger(node_name="test_node",
                            rpc_url="http://test_url",
                            expected_blocks_count=99,
-                           count_start=1,
-                           cemented_start=1,
                            timeout=0.5)
+        await logger.async_init(count_start=1, cemented_start=1)
         assert logger.node_version == "???"

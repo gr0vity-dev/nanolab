@@ -14,11 +14,11 @@ class IBlockGenerator(ABC):
         pass
 
     @abstractmethod
-    def blockgen_single_change(self,
-                               source_seed=None,
-                               source_index=None,
-                               source_private_key=None,
-                               rep=None):
+    async def blockgen_single_change(self,
+                                     source_seed=None,
+                                     source_index=None,
+                                     source_private_key=None,
+                                     rep=None):
         pass
 
     @abstractmethod
@@ -41,19 +41,19 @@ class BlockGenerator(IBlockGenerator):
         random_account = self.nano_lib.nanolib_account_data(seed=random_seed)
         return random_account["account"]
 
-    def blockgen_single_change(self,
-                               source_seed=None,
-                               source_index=None,
-                               source_private_key=None,
-                               rep=None):
+    async def blockgen_single_change(self,
+                                     source_seed=None,
+                                     source_index=None,
+                                     source_private_key=None,
+                                     rep=None):
         rep = rep if rep else self.get_random_account()
         if source_private_key:
-            res = self.nano_rpc_default.create_change_block_pkey(
+            res = await self.nano_rpc_default.create_change_block_pkey(
                 source_private_key, rep, broadcast=self.broadcast)
             return res
 
         if source_seed and source_index >= 0:
-            return self.nano_rpc_default.create_change_block(
+            return await self.nano_rpc_default.create_change_block(
                 source_seed, source_index, rep, broadcast=self.broadcast)
 
         raise ValueError(
@@ -63,11 +63,11 @@ class BlockGenerator(IBlockGenerator):
     def set_broadcast_blocks(self, broadcast):
         self.broadcast = broadcast
 
-    def create_send_and_open_block(self, send_amount_raw, source_seed,
-                                   source_index, destination_seed,
-                                   destination_index, representative):
+    async def create_send_and_open_block(self, send_amount_raw, source_seed,
+                                         source_index, destination_seed,
+                                         destination_index, representative):
         # destination = self.nano_rpc_default.generate_account(destination_seed, destination_index)
-        return self.blockgen_single_account_opener(
+        return await self.blockgen_single_account_opener(
             representative=representative,
             source_seed=source_seed,
             source_index=source_index,
@@ -75,7 +75,7 @@ class BlockGenerator(IBlockGenerator):
             destination_index=destination_index,
             send_amount=send_amount_raw)
 
-    def blockgen_single_account_opener(
+    async def blockgen_single_account_opener(
             self,
             representative=None,
             source_key=None,  #
@@ -103,13 +103,13 @@ class BlockGenerator(IBlockGenerator):
                                                     seed=source_seed,
                                                     index=source_index)
 
-        send_block = self.nano_rpc_default.create_send_block_pkey(
+        send_block = await self.nano_rpc_default.create_send_block_pkey(
             source["private"],
             destination["account"],
             send_amount,
             broadcast=self.broadcast)
 
-        open_block = self.nano_rpc_default.create_open_block(
+        open_block = await self.nano_rpc_default.create_open_block(
             destination["account"],
             destination["private"],
             send_amount,

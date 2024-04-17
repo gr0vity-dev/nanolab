@@ -4,39 +4,40 @@ import time
 from datetime import datetime
 import asyncio
 from typing import AsyncIterator
+import logging
 
 
 class RPCLogger(ILogger):
     """A logger that fetches logs from an RPC endpoint."""
-
     FETCH_INTERVAL_DELAY = 0.1  # seconds
 
-    def __init__(self,
-                 node_name: str,
-                 rpc_url: str,
-                 expected_blocks_count: int,
-                 timeout: int,
-                 count_start=None,
-                 cemented_start=None):
+    def __init__(self, node_name: str, rpc_url: str, expected_blocks_count: int, timeout: int):
         self.node_name = node_name
         self.rpc_url = rpc_url
         self.expected_blocks_count = int(expected_blocks_count)
         self.timeout = int(timeout)
         self.nanorpc = NanoRpc(self.rpc_url)
-        if count_start is None or cemented_start is None:
-            self.count_start, self.cemented_start = self._get_block_count()
-        else:
-            self.count_start = count_start
-            self.cemented_start = cemented_start
-        node_version = self.nanorpc.version()
-        self.node_version = f'{node_version["node_vendor"]} {node_version["build_info"][0:7]}' if node_version else "???"
-        self.end_block_count = self.count_start + self.expected_blocks_count
+        # These will be initialized in async_init
+        self.count_start = None
+        self.cemented_start = None
+        self.node_version = None
+        self.end_block_count = None
         self.previous_count = 0
         self.previous_cemented = 0
         self.previous_elapsed_time = 0
 
-    def _get_block_count(self):
-        block_count = self.nanorpc.block_count()
+    async def async_init(self, count_start=None, cemented_start=None):
+        if count_start is None or cemented_start is None:
+            self.count_start, self.cemented_start = await self._get_block_count()
+        else:
+            self.count_start = count_start
+            self.cemented_start = cemented_start
+        node_version = await self.nanorpc.version()
+        self.node_version = f'{node_version["node_vendor"]} {node_version["build_info"][0:7]}' if node_version else "???"
+        self.end_block_count = self.count_start + self.expected_blocks_count
+
+    async def _get_block_count(self):
+        block_count = await self.nanorpc.block_count()
         return int(block_count["count"]), int(block_count["cemented"])
 
     def is_fully_synced(self, cemented):
@@ -49,7 +50,7 @@ class RPCLogger(ILogger):
         start_time = time.time()
         timeout_start = time.time()
         while True:
-            count, cemented = self._get_block_count()
+            count, cemented = await self._get_block_count()
             is_synced = self.is_fully_synced(cemented)
             percent_cemented = ((cemented - self.cemented_start) /
                                 self.expected_blocks_count) * 100

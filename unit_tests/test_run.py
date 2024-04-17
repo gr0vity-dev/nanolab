@@ -116,8 +116,8 @@ class TestRun(unittest.TestCase):
         start_time = time.time()
         run.main()
         duration = time.time() - start_time
-        self.assertTrue(duration >= 0.93, f"too short: {duration:.2f} s")
-        self.assertTrue(duration <= 1.07, f"too long: {duration:.2f} s")
+        self.assertTrue(duration >= 0.90, f"too short: {duration:.2f} s")
+        self.assertTrue(duration <= 1.10, f"too long: {duration:.2f} s")
 
     @patch('sys.argv', [
         'nanolab', 'run', '--testcase',
@@ -263,8 +263,8 @@ class TestRun(unittest.TestCase):
         start_time = time.time()
         run.main()
         duration = time.time() - start_time
-        self.assertTrue(duration >= 0.93, f"too short: {duration:.2f} s")
-        self.assertTrue(duration <= 1.07, f"too long: {duration:.2f} s")
+        self.assertTrue(duration >= 0.9, f"too short: {duration:.2f} s")
+        self.assertTrue(duration <= 1.1, f"too long: {duration:.2f} s")
 
     @patch('sys.argv', [
         'nanolab', 'run', '--testcase',

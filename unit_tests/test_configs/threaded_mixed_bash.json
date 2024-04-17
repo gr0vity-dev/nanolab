@@ -9,7 +9,7 @@
                     "type": "python",
                     "class": "TestClass",
                     "method": "long_running_method",
-                    "variables" : {"duration" : 0.5} 
+                    "variables" : {"duration" : 1} 
                 },
                 {
                     "type": "bash",

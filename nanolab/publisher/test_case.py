@@ -56,9 +56,9 @@ class ChangeBlockWaitConfirmation(ITestCase):
     async def _generate_and_confirm_block(self, index):
         self.bg_l.set_broadcast_blocks(True)
         representative = self.bg_l.get_random_account()
-        res = self.bg_l.blockgen_single_change(source_seed=self.source_seed,
-                                               source_index=index,
-                                               rep=representative)
+        res = await self.bg_l.blockgen_single_change(source_seed=self.source_seed,
+                                                     source_index=index,
+                                                     rep=representative)
         try:
             await self.ba_l.assert_single_block_confirmed_wait(
                 res["hash"], self.timeout_s, 0.05)
@@ -101,10 +101,10 @@ class SendBlockWaitConfirmation(ITestCase):
     async def _generate_and_confirm_block(self, index):
         self.bg_l.set_broadcast_blocks(True)
         representative = self.bg_l.get_random_account()
-        res = self.bg_l.create_send_and_open_block(self.send_amount_raw,
-                                                   self.source_seed, index,
-                                                   self.destination_seed,
-                                                   index, representative)
+        res = await self.bg_l.create_send_and_open_block(self.send_amount_raw,
+                                                         self.source_seed, index,
+                                                         self.destination_seed,
+                                                         index, representative)
         try:
             await self.ba_l.assert_blocks_confirmed_wait(
                 [block["hash"] for block in res], self.timeout_s, 0.05)

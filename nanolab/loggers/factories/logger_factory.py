@@ -5,7 +5,7 @@ from typing import Dict, Any
 class LoggerFactory:
 
     @staticmethod
-    def create_logger(logger_type: str, config: Dict[str, Any]):
+    async def create_logger(logger_type: str, config: Dict[str, Any]):
         if logger_type == "rpc":
             builder = RPCLoggerBuilder()
         elif logger_type == "websocket":
@@ -18,4 +18,4 @@ class LoggerFactory:
             if hasattr(builder, f'set_{key}'):
                 getattr(builder, f'set_{key}')(value)
 
-        return builder.build()
+        return await builder.build()

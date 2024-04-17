@@ -73,9 +73,9 @@ class BlockAsserts(IBlockAsserts):
         assert all(info['exists']
                    for info in block_infos), f"Some blocks were not published"
 
-    def assert_all_blocks_cemented(self):
+    async def assert_all_blocks_cemented(self):
         for rpc in self.nano_rpc_all:
-            block_count = rpc.block_count()
+            block_count = await rpc.block_count()
             assert block_count["count"] == block_count[
                 "cemented"], "Not all blocks are cemented"
 

@@ -94,8 +94,8 @@
         ],
         "commands": [
             {
-                "type": "bash",
-                "command": "for i in {SETUP_NODES}; do if [ \"{IS_ROCKS_DB}\" = true ]; then rm -rf ./nano_nodes/$i/NanoTest/rocksdb && cp -r {LEDGER} ./nano_nodes/$i/NanoTest/rocksdb; else cp {LEDGER} ./nano_nodes/$i/NanoTest/data.ldb; fi; done"
+               "type": "bash",
+               "command": "for i in {SETUP_NODES}; do if [ \"{IS_ROCKS_DB}\" = true ]; then rm -rf ./nano_nodes/$i/NanoTest/rocksdb && if echo {LEDGER} | grep -q '.tar.gz' ; then mkdir -p ./nano_nodes/$i/NanoTest/rocksdb && tar --strip-components=1 -xzf {LEDGER} -C ./nano_nodes/$i/NanoTest/rocksdb; else cp -r {LEDGER} ./nano_nodes/$i/NanoTest/rocksdb;fi; else cp {LEDGER} ./nano_nodes/$i/NanoTest/data.ldb; fi; done"
             }
         ]
     },

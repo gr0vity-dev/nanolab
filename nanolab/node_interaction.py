@@ -7,6 +7,7 @@ import asyncio
 import random
 import time
 import itertools
+import threading
 
 from nanolab.loggers.logger_manager import LoggingManager
 
@@ -120,8 +121,15 @@ class SocketPublish:
             return str(self.hdr) + "\n" + str(self.block)
 
     def get_xnolib_context(self, peers=None):
-        ctx = get_config_parser().get_xnolib_localctx()
-        ctx["net_id"] = network_id(ord('X'))
+        conf_p = get_config_parser()
+        ctx = conf_p.get_xnolib_localctx()
+        if  conf_p.get_env() == 'beta' :
+            ctx["net_id"] = network_id(ord('B'))
+        elif  conf_p.get_env() == 'live' :
+            ctx["net_id"] = network_id(ord('L'))
+        else :
+            ctx["net_id"] = network_id(ord('X'))
+
 
         if peers is not None:  # chose a single peer , if enabled in config file
             for peer in ctx["peers"].copy():
@@ -132,7 +140,7 @@ class SocketPublish:
     def __set_sockets_handshake(self):
         ctx = self.get_xnolib_context(peers=self.peers)
         msgtype = message_type_enum.publish
-        hdr = message_header(ctx['net_id'], [18, 18, 18],
+        hdr = message_header(ctx['net_id'], [21, 21, 20],
                              message_type(msgtype), 0)
         hdr.set_block_type(block_type_enum.state)
         all_peers = get_peers_from_service(ctx)
@@ -230,6 +238,26 @@ class SocketPublish:
             tasks = self.create_default_tasks(sockets, messages)
         return tasks
 
+    def consume_and_discard(self, socket_info):
+        sock = socket_info['socket']
+        peer = socket_info['peer']
+        while True:
+            if self.read_socket(sock, 1024) is None:
+                time.sleep(0.1)
+                print(f"No data from {peer}. Wait 100ms")
+
+    def read_socket(self, sock, byte_count: int) -> bytes or None:
+        try:
+            data = sock.recv(byte_count)
+            if not data:
+                return None
+            return data
+        except OSError as msg:
+            # Silently handle timeout errors and other OSError exceptions
+            print(f"Error reading from socket (peer: {sock.getpeername()}): {msg}")
+            return None
+
+
     def create_split_tasks(self, sockets, messages, skip_first_socket=False):
         num_sockets = len(sockets) - 1 if skip_first_socket else len(sockets)
         messages_per_socket, remainder = divmod(len(messages), num_sockets)
@@ -260,6 +288,10 @@ class SocketPublish:
         return tasks
 
     async def run(self, messages: List[Any]) -> int:
+        for socket_info in self.sockets:
+            threading.Thread(target=self.consume_and_discard, args=(socket_info,), daemon=True).start()
+
+
         tasks = self.create_publish_tasks(self.sockets, messages)
         await asyncio.gather(*tasks)
         # make sure the last few blocks are published.

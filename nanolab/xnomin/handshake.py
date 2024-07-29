@@ -44,7 +44,7 @@ class node_handshake_id:
             cls, ctx: dict, s: socket.socket,
             signing_key: py_ed25519_blake2b.SigningKey,
             verifying_key: py_ed25519_blake2b.VerifyingKey) -> bytes:
-        hdr = message_header(ctx['net_id'], [18, 18, 18], message_type(10), 1)
+        hdr = message_header(ctx['net_id'], [21, 21, 20], message_type(10), 1)
         msg_handshake = handshake_query(hdr)
         s.sendall(msg_handshake.serialise())
         try:
@@ -104,7 +104,7 @@ class handshake_response_query(node_handshake_id):
                         verifying_key: py_ed25519_blake2b.VerifyingKey):
         my_cookie = token_bytes(32)
         sig = signing_key.sign(cookie)
-        hdr = message_header(ctx['net_id'], [18, 18, 18], message_type(10), 3)
+        hdr = message_header(ctx['net_id'], [21, 21, 20], message_type(10), 3)
         return handshake_response_query(hdr, my_cookie,
                                         verifying_key.to_bytes(), sig)
 
@@ -188,7 +188,7 @@ class handshake_response(node_handshake_id):
                         signing_key: py_ed25519_blake2b.SigningKey,
                         verifying_key: py_ed25519_blake2b.VerifyingKey):
         sig = signing_key.sign(cookie)
-        hdr = message_header(ctx['net_id'], [18, 18, 18], message_type(10), 2)
+        hdr = message_header(ctx['net_id'], [21, 21, 20], message_type(10), 2)
         return handshake_response(hdr, verifying_key.to_bytes(), sig)
 
     @classmethod

@@ -9,7 +9,7 @@ class telemetry_req:
 
     def __init__(self, ctx: dict):
         self.header = message_header(
-            ctx['net_id'], [18, 18, 18],
+            ctx['net_id'], [21, 21, 20],
             message_type(message_type_enum.telemetry_req), 0)
 
     def serialise(self) -> bytes:

@@ -126,7 +126,7 @@ class SocketPublish:
         if  conf_p.get_env() == 'beta' :
             ctx["net_id"] = network_id(ord('B'))
         elif  conf_p.get_env() == 'live' :
-            ctx["net_id"] = network_id(ord('L'))
+            ctx["net_id"] = network_id(ord('C'))
         else :
             ctx["net_id"] = network_id(ord('X'))
 

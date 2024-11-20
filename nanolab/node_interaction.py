@@ -2,12 +2,14 @@ from nanolab.xnomin.peers import get_connected_socket_endpoint, message_header, 
 from nanolab.xnomin.handshake import node_handshake_id
 from nanomock.modules.nl_parse_config import ConfigReadWrite
 from nanolab.src.utils import get_config_parser
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Any, Dict, List
 import asyncio
 import random
 import time
 import itertools
 import threading
+
 
 from nanolab.loggers.logger_manager import LoggingManager
 
@@ -139,20 +141,31 @@ class SocketPublish:
 
     def __set_sockets_handshake(self):
         ctx = self.get_xnolib_context(peers=self.peers)
+
         msgtype = message_type_enum.publish
         hdr = message_header(ctx['net_id'], [21, 21, 20],
-                             message_type(msgtype), 0)
+                            message_type(msgtype), 0)
         hdr.set_block_type(block_type_enum.state)
         all_peers = get_peers_from_service(ctx)
         sockets = []
-        # Handshake with all peers
-        for peer in all_peers:
+
+        def handshake_peer_wrapper(peer):
             s = self.handshake_peer(str(peer.ip), peer.port, ctx)
             if s is not None:
-                sockets.append({
+                return {
                     "socket": s,
-                    "peer": str(peer.ip) + ":" + str(peer.port)
-                })
+                    "peer": f"{peer.ip}:{peer.port}"
+                }
+            return None
+
+        # Adjust max_workers according to your needs
+        with ThreadPoolExecutor(max_workers=20) as executor:
+            futures = {executor.submit(handshake_peer_wrapper, peer): peer for peer in all_peers}
+            for future in as_completed(futures):
+                result = future.result()
+                if result is not None:
+                    sockets.append(result)
+
         return sockets, hdr
 
     def flatten_messages(self,
@@ -240,11 +253,11 @@ class SocketPublish:
 
     def consume_and_discard(self, socket_info):
         sock = socket_info['socket']
-        peer = socket_info['peer']
+        # peer = socket_info['peer']
         while True:
             if self.read_socket(sock, 1024) is None:
-                time.sleep(0.1)
-                print(f"No data from {peer}. Wait 100ms")
+                time.sleep(0.25)
+                # print(f"No data from {peer}. Wait 100ms")
 
     def read_socket(self, sock, byte_count: int) -> bytes or None:
         try:

@@ -3,9 +3,8 @@ from nanolab.publisher.block_asserts import BlockAsserts
 from nanolab.publisher.block_generator import BlockGenerator
 from nanolab.publisher.confirmation_stats import ConfirmationStatsManager
 from nanolab.src.utils import get_config_parser, print_dot
-import time
 from nanolab.publisher.event_bus import EventBus
-from nanolab.publisher.block_event import BlockConfirmationEvent
+
 
 
 class ITestCase(ABC):

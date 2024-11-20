@@ -1,21 +1,24 @@
 from nanolab.xnomin.peers import message_header, py_ed25519_blake2b, socket, hexlify, message_type
 from secrets import token_bytes
 from typing import Tuple
+import time
 
 
-def read_socket(sock: socket.socket, byte_count: int) -> bytes or None:
+def read_socket(sock: socket.socket, byte_count: int, timeout: float = 30.0) -> bytes or None:
     try:
+        sock.settimeout(timeout)  # Set timeout for socket operations
         data = bytearray()
+        start_time = time.time()
         while len(data) < byte_count:
-            data += sock.recv(1)
-            if len(data) == 0:
-                raise ValueError('SocketClosedByPeer read_socket: data=%s' %
-                                 data)
-
+            if time.time() - start_time > timeout:
+                raise socket.timeout("Timeout while reading socket")
+            chunk = sock.recv(min(byte_count - len(data), 1024))
+            if not chunk:
+                raise ValueError('SocketClosedByPeer read_socket: data=%s' % data)
+            data += chunk
         return bytes(data)
-
-    except OSError as msg:
-        print('read_socket] Error reading %d bytes, data=%s, msg=%s' %
+    except (OSError, socket.timeout) as msg:
+        print('[read_socket] Error reading %d bytes, data=%s, msg=%s' %
               (byte_count, hexlify(data), msg))
         return None
 
